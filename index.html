@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบนับเวลาพร้อมกันหลายคน</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Sarabun', sans-serif;
+        }
+        /* Style for the scrollbar */
+        #userListContainer::-webkit-scrollbar,
+        #historyContainer::-webkit-scrollbar,
+        #activeTimersContainer::-webkit-scrollbar {
+            width: 8px;
+        }
+        #userListContainer::-webkit-scrollbar-track,
+        #historyContainer::-webkit-scrollbar-track,
+        #activeTimersContainer::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        #userListContainer::-webkit-scrollbar-thumb,
+        #historyContainer::-webkit-scrollbar-thumb,
+        #activeTimersContainer::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 4px;
+        }
+        #userListContainer::-webkit-scrollbar-thumb:hover,
+        #historyContainer::-webkit-scrollbar-thumb:hover,
+        #activeTimersContainer::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+        .timer-card {
+            transition: all 0.3s ease;
+        }
+        .delete-btn {
+            opacity: 0.5;
+            transition: opacity 0.2s ease;
+        }
+        .timer-card:hover .delete-btn {
+            opacity: 1;
+        }
+        .input-error {
+            border-color: #ef4444;
+            box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.4);
+        }
+        .shake {
+            animation: shake 0.5s;
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen p-4">
+
+    <!-- Login Screen -->
+    <div id="loginScreen" class="fixed inset-0 bg-gray-200 flex items-center justify-center z-50">
+        <div class="w-full max-w-sm p-8 bg-white rounded-xl shadow-lg">
+            <h1 class="text-3xl font-bold text-center text-gray-800 mb-6">เข้าสู่ระบบ</h1>
+            <div class="space-y-4">
+                <div>
+                    <label for="usernameInput" class="block text-sm font-medium text-gray-700">ชื่อผู้ใช้</label>
+                    <input type="text" id="usernameInput" class="mt-1 block w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-lg">
+                </div>
+                <div>
+                    <label for="passwordInput" class="block text-sm font-medium text-gray-700">รหัสผ่าน</label>
+                    <input type="password" id="passwordInput" class="mt-1 block w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-lg">
+                </div>
+                <p id="loginError" class="text-red-500 text-center text-sm hidden">ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง</p>
+                <button id="loginBtn" class="w-full bg-indigo-600 text-white font-bold py-3 px-4 rounded-md hover:bg-indigo-700 transition text-lg">
+                    เข้าสู่ระบบ
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="appContainer" class="w-full max-w-screen-2xl mx-auto grid lg:grid-cols-5 gap-8 hidden">
+        
+        <!-- Column 1: Controls -->
+        <div id="controlsColumn" class="bg-white p-6 rounded-xl shadow-lg flex flex-col lg:col-span-1">
+             <h2 class="text-xl font-bold text-gray-800 mb-4">ค้นหาและตั้งค่า</h2>
+            
+            <button id="logoutBtn" class="w-full mb-4 bg-gray-500 text-white font-bold py-2 px-4 rounded-md hover:bg-gray-600 transition">
+                ออกจากระบบ
+            </button>
+
+            <div class="bg-gray-100 p-2 rounded-lg mb-4">
+                <label class="block text-xs font-medium text-gray-700 mb-1">ตั้งค่าเวลาเริ่มต้น</label>
+                <div class="grid grid-cols-3 gap-1">
+                    <input type="number" id="hoursInput" placeholder="ชม." class="w-full p-1 border rounded-md text-center text-sm" min="0">
+                    <input type="number" id="minutesInput" placeholder="น." class="w-full p-1 border rounded-md text-center text-sm" min="0" max="59">
+                    <input type="number" id="secondsInput" placeholder="ว." class="w-full p-1 border rounded-md text-center text-sm" min="0" max="59">
+                </div>
+                <button id="setDefaultTimeBtn" class="w-full mt-2 bg-green-600 text-white font-bold py-1 px-2 rounded-md hover:bg-green-700 transition text-sm">
+                    ตั้งค่าเวลา
+                </button>
+            </div>
+            
+            <input type="text" id="idInput" class="block w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-base mb-4 transition" placeholder="ยิงบาร์โค้ด หรือ ค้นหา...">
+            
+            <div id="userListContainer" class="flex-grow overflow-y-auto bg-gray-50 p-2 border rounded-lg min-h-[20rem]">
+                 <div id="listStatus" class="p-4 text-center"></div>
+                 <ul id="userList" class="space-y-1"></ul>
+            </div>
+            <button id="resetAllBtn" class="w-full mt-4 bg-red-600 text-white font-bold py-2 px-4 rounded-md hover:bg-red-700 transition">
+                รีเซ็ตข้อมูลทั้งหมด
+            </button>
+        </div>
+
+        <!-- Column 2: Active Timers -->
+        <div class="bg-white p-8 rounded-xl shadow-lg flex flex-col lg:col-span-2">
+            <h1 class="text-2xl font-bold text-center text-gray-800 mb-2">ระบบนับเวลา</h1>
+            <p class="text-center text-gray-500 mb-6" id="statusText">กรุณายิงบาร์โค้ดเพื่อเริ่ม</p>
+            
+            <div id="activeTimersContainer" class="flex-grow bg-gray-50 rounded-lg p-4 space-y-4 overflow-y-auto h-full min-h-[30rem]">
+                <div id="timerPlaceholder" class="text-center text-gray-400 flex items-center justify-center h-full">
+                    <p>ยิงบาร์โค้ดเพื่อเริ่มนับเวลา...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Column 3: History -->
+        <div class="bg-white p-8 rounded-xl shadow-lg flex flex-col lg:col-span-2">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4 text-center">ประวัติ (จากรอบล่าสุด)</h2>
+            <div id="historyContainer" class="flex-grow overflow-y-auto border rounded-lg min-h-[30rem]">
+                <table class="w-full text-sm text-left text-gray-500">
+                    <thead class="text-xs text-gray-700 uppercase bg-gray-50 sticky top-0">
+                        <tr>
+                            <th scope="col" class="px-6 py-3">#</th>
+                            <th scope="col" class="px-6 py-3">ชื่อ-สกุล</th>
+                            <th scope="col" class="px-6 py-3">เวลาตั้งค่า</th>
+                            <th scope="col" class="px-6 py-3">เวลาที่ครบกำหนด</th>
+                            <th scope="col" class="px-6 py-3">สถานะ</th>
+                        </tr>
+                    </thead>
+                    <tbody id="historyBody">
+                       <tr class="bg-white border-b"><td colspan="5" class="px-6 py-4 text-center">ยังไม่มีประวัติ</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // VVVVVVVV  วาง URL ของ Web App ที่คุณสร้างจาก Google Apps Script ตรงนี้ VVVVVVVV
+        const appsScriptUrl = 'https://script.google.com/macros/s/AKfycbxElRMDT970Oxso1TL2dMeQLuUJDliRIEHE0xaRtcQa8XyWJbHhz1DRtHi9o-OXeCCW/exec';
+        // ^^^^^^^^  วาง URL ของ Web App ที่คุณสร้างจาก Google Apps Script ตรงนี้ ^^^^^^^^
+        
+        // Login Elements
+        const loginScreen = document.getElementById('loginScreen');
+        const usernameInput = document.getElementById('usernameInput');
+        const passwordInput = document.getElementById('passwordInput');
+        const loginBtn = document.getElementById('loginBtn');
+        const loginError = document.getElementById('loginError');
+        const logoutBtn = document.getElementById('logoutBtn');
+
+        // Main Page Elements
+        const idInput = document.getElementById('idInput');
+        const statusText = document.getElementById('statusText');
+        const userList = document.getElementById('userList');
+        const listStatus = document.getElementById('listStatus');
+        const activeTimersContainer = document.getElementById('activeTimersContainer');
+        const setDefaultTimeBtn = document.getElementById('setDefaultTimeBtn');
+        const hoursInput = document.getElementById('hoursInput');
+        const minutesInput = document.getElementById('minutesInput');
+        const secondsInput = document.getElementById('secondsInput');
+        let timerPlaceholder = document.getElementById('timerPlaceholder');
+        const resetAllBtn = document.getElementById('resetAllBtn');
+        const historyBody = document.getElementById('historyBody');
+        const appContainer = document.getElementById('appContainer');
+
+        // App State
+        let globalAnimationFrameId = null;
+        let allUsers = [];
+        let activeTimers = [];
+        let historyData = [];
+        let sessionDefaultTimeInSeconds = null;
+
+        // Sound Synthesizers
+        let successSynth, errorSynth;
+
+        // Firebase State
+        let db, auth;
+        let appDataDocRef;
+        let unsubscribe; 
+
+        async function initializeFirebase(appId, firebaseConfig) {
+            try {
+                if (!appId || !firebaseConfig) {
+                     throw new Error("CONFIGURATION_MISSING");
+                }
+                
+                const app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                auth = getAuth(app);
+
+                await signInAnonymously(auth);
+                
+                appDataDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'countdownData', 'appState');
+                
+                await fetchData();
+
+            } catch(error) {
+                console.error("Firebase Initialization Error:", error);
+                let errorTitle = "เกิดข้อผิดพลาดในการเชื่อมต่อฐานข้อมูล";
+                let errorMessage = `<p class="text-sm text-gray-700 mb-4">ไม่สามารถเริ่มต้นการเชื่อมต่อกับฐานข้อมูลได้ กรุณาตรวจสอบว่า Firebase Config ถูกต้อง</p>`;
+
+                if (error.code) { 
+                     errorTitle = `เกิดข้อผิดพลาด: ${error.code}`;
+                     errorMessage = `<p class="text-sm text-gray-700 mb-4">${error.message}</p>`;
+                }
+                
+                appContainer.innerHTML = `
+                    <div class="col-span-3 text-center bg-white p-8 rounded-xl shadow-lg">
+                        <h2 class="text-2xl font-bold text-red-600 mb-4">${errorTitle}</h2>
+                        ${errorMessage}
+                        <button onclick="window.location.reload();" class="mt-4 bg-blue-500 text-white font-bold py-2 px-4 rounded-md hover:bg-blue-600 transition">
+                            รีเฟรช
+                        </button>
+                    </div>
+                `;
+            }
+        }
+
+        async function main() {
+            idInput.focus();
+            document.body.addEventListener('click', () => initializeAudio(), { once: true });
+            document.body.addEventListener('keydown', () => initializeAudio(), { once: true });
+
+            const firebaseConfig = {
+              apiKey: "AIzaSyC4KDnkJ_3Md1hHqr3pu5IxbDuSwUz7-vY",
+              authDomain: "coerf-a033d.firebaseapp.com",
+              projectId: "coerf-a033d",
+              storageBucket: "coerf-a033d.firebasestorage.app",
+              messagingSenderId: "1004453397450",
+              appId: "1:1004453397450:web:83825d12550e8ecf940533",
+              measurementId: "G-TBKV4XWWM7"
+            };
+            const appId = firebaseConfig.appId;
+
+            if (!appId || !firebaseConfig.apiKey) {
+                appContainer.innerHTML = `
+                    <div class="col-span-3 text-center bg-white p-8 rounded-xl shadow-lg">
+                        <h2 class="text-2xl font-bold text-red-600 mb-4">ข้อผิดพลาดร้ายแรง</h2>
+                        <p class="text-sm text-gray-700 mb-4">ไม่พบ Firebase Config ในโค้ดของแอปพลิเคชัน</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            await initializeFirebase(appId, firebaseConfig);
+        }
+
+        async function fetchData() {
+            idInput.disabled = true;
+            idInput.placeholder = "กำลังโหลดข้อมูล...";
+            listStatus.innerHTML = '<p class="text-gray-500">กำลังโหลดข้อมูล...</p>';
+            listStatus.classList.remove('hidden');
+            userList.classList.add('hidden');
+
+            try {
+                const response = await fetch(`${appsScriptUrl}?cachebust=${Date.now()}`);
+                if (!response.ok) {
+                    throw new Error(`ไม่สามารถเชื่อมต่อกับ Apps Script ได้: ${response.status} ${response.statusText}`);
+                }
+                const data = await response.json();
+                if (data.status === 'error') {
+                    throw new Error(`Apps Script Error: ${data.message}`);
+                }
+                allUsers = data;
+
+                if (allUsers.length === 0) throw new Error('ไม่พบข้อมูลใน Google Sheet หรือไฟล์อาจจะว่างเปล่า');
+
+                idInput.disabled = false;
+                idInput.placeholder = "ยิงบาร์โค้ด หรือ ค้นหา...";
+                listStatus.classList.add('hidden');
+                userList.classList.remove('hidden');
+                
+                setupSnapshotListener(); 
+
+            } catch (error) {
+                console.error('Failed to load user list:', error);
+                idInput.placeholder = "ไม่สามารถโหลดรายชื่อได้";
+                
+                let errorTitle = "เกิดข้อผิดพลาดในการโหลดข้อมูล";
+                let errorMessage = `<p class="text-sm text-gray-700 mb-4">${error.message}</p>`;
+                
+                listStatus.innerHTML = `<div class="text-left"><p class="text-red-600 font-bold mb-2">${errorTitle}</p>${errorMessage}</div><button id="reloadBtn" class="mt-4 bg-blue-500 text-white font-bold py-2 px-4 rounded-md hover:bg-blue-600 transition">ลองอีกครั้ง</button>`;
+                listStatus.classList.remove('hidden');
+                document.getElementById('reloadBtn').addEventListener('click', fetchData);
+            }
+        }
+
+        function setupSnapshotListener() {
+            if (unsubscribe) unsubscribe();
+
+            unsubscribe = onSnapshot(appDataDocRef, (docSnap) => {
+                activeTimers.forEach(t => {
+                     const card = document.getElementById(`timer-${t.user.id}`);
+                     if (card) card.remove();
+                });
+                activeTimers = [];
+                historyData = [];
+                allUsers.forEach(u => u.completed = false);
+
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    historyData = data.timerHistory || [];
+                    const savedCompletedIds = data.completedUserIds || [];
+                    const savedTimers = data.activeTimers || [];
+                    
+                    savedCompletedIds.forEach(id => {
+                        const user = allUsers.find(u => u.id === id);
+                        if (user) user.completed = true;
+                    });
+                    
+                    const timerPlaceholderEl = document.getElementById('timerPlaceholder');
+                    if (savedTimers.length > 0 && timerPlaceholderEl) {
+                        timerPlaceholderEl.remove();
+                    }
+
+                    savedTimers.forEach(savedTimer => {
+                        const user = allUsers.find(u => u.id === savedTimer.id);
+                        if (user && !user.completed) {
+                             const timeLeftMs = savedTimer.endTime - Date.now();
+                             if (timeLeftMs > 0) {
+                                 const timerData = { user, startTime: Date.now(), duration: timeLeftMs };
+                                 activeTimers.push(timerData);
+                                 createTimerCard(user);
+                             }
+                        }
+                    });
+                }
+                
+                if (activeTimers.length > 0) startGlobalAnimationLoop();
+                else if (!document.getElementById('timerPlaceholder')) {
+                     activeTimersContainer.innerHTML = '<div id="timerPlaceholder" class="text-center text-gray-400 flex items-center justify-center h-full"><p>ยิงบาร์โค้ดเพื่อเริ่มนับเวลา...</p></div>';
+                }
+
+                renderHistory();
+                renderUserList(idInput.value.trim());
+            }, (error) => {
+                console.error("Firestore snapshot error:", error);
+                statusText.textContent = "การเชื่อมต่อข้อมูลขัดข้อง";
+                statusText.classList.add('text-red-600', 'font-bold');
+            });
+        }
+        
+        function initializeAudio() {
+            if (Tone.context.state !== 'running') {
+                Tone.context.resume();
+            }
+            if (!successSynth) successSynth = new Tone.Synth({ oscillator: { type: 'sine' }, envelope: { attack: 0.005, decay: 0.1, sustain: 0.3, release: 1 } }).toDestination();
+            if (!errorSynth) errorSynth = new Tone.Synth({ oscillator: { type: 'square' }, envelope: { attack: 0.005, decay: 0.2, sustain: 0.1, release: 1 } }).toDestination();
+        }
+
+        window.onload = function() {
+            if (sessionStorage.getItem('isLoggedIn') === 'true') {
+                loginScreen.classList.add('hidden');
+                appContainer.classList.remove('hidden');
+                main();
+            } else {
+                usernameInput.focus();
+            }
+        };
+        
+        function renderUserList(filter = '') {
+            userList.innerHTML = '';
+            if (!filter) return;
+
+            const lowerCaseFilter = filter.toLowerCase();
+            const filteredUsers = allUsers.filter(user => 
+                user.fullName.toLowerCase().includes(lowerCaseFilter) || 
+                user.id.includes(filter)
+            );
+            
+            if (filteredUsers.length === 0) {
+                 userList.innerHTML = `<div class="p-4 text-gray-500">ไม่พบรายชื่อที่ตรงกัน</div>`;
+                 return;
+            }
+            filteredUsers.forEach(user => {
+                const li = document.createElement('li');
+                li.dataset.id = user.id;
+                let content = `<span class="font-bold">${user.fullName}</span><br><span class="text-sm text-gray-500">${user.id}</span>`;
+                let classes = 'p-3 rounded-md cursor-pointer hover:bg-indigo-100 transition-colors duration-150';
+                if (activeTimers.some(t => t.user.id === user.id)) classes = 'p-3 rounded-md text-white bg-blue-500';
+                else if (user.completed) {
+                    content = `<span class="font-bold">${user.fullName}</span><br><span class="text-sm">${user.id}</span><span class="float-right text-green-600 font-bold">✔ เสร็จสิ้น</span>`;
+                    classes = 'p-3 rounded-md text-gray-500 bg-green-100 line-through';
+                }
+                li.innerHTML = content;
+                li.className = classes;
+                userList.appendChild(li);
+            });
+        }
+        
+        function startProcess(id) {
+            const record = allUsers.find(user => user.id === id);
+
+            if (activeTimers.some(timer => timer.user.id === id)) {
+                updateStatusMessage(`"${id}" กำลังนับเวลาอยู่แล้ว`, 'info');
+                return;
+            }
+
+            if (record) {
+                if (record.completed) {
+                    updateStatusMessage(`"${record.fullName}" ได้นับเวลาไปแล้ว`, 'info');
+                    return;
+                }
+                if(successSynth) successSynth.triggerAttackRelease("C5", "8n");
+                timerPlaceholder = document.getElementById('timerPlaceholder');
+                if (timerPlaceholder) timerPlaceholder.remove();
+                const durationInSeconds = sessionDefaultTimeInSeconds !== null ? sessionDefaultTimeInSeconds : parseInt(record.timeInSeconds, 10);
+                const timerData = { user: record, startTime: Date.now(), duration: durationInSeconds * 1000 };
+                activeTimers.push(timerData);
+                createTimerCard(record);
+                renderUserList(idInput.value.trim());
+                startGlobalAnimationLoop();
+                updateStatusMessage(`เริ่มนับเวลาสำหรับ: ${record.fullName}`, 'success');
+                saveState();
+            } else {
+                if(errorSynth) errorSynth.triggerAttackRelease("C3", "8n");
+                updateStatusMessage(`ไม่พบข้อมูลสำหรับเลข: ${id}`, 'error');
+                idInput.classList.add('input-error');
+                setTimeout(() => idInput.classList.remove('input-error'), 1000);
+            }
+            idInput.value = '';
+            renderUserList('');
+        }
+        
+        function createTimerCard(user) {
+            const card = document.createElement('div');
+            card.id = `timer-${user.id}`;
+            card.className = 'timer-card p-4 bg-indigo-500 text-white rounded-lg shadow-md flex justify-between items-center';
+            card.innerHTML = `
+                <div class="flex-grow">
+                    <h3 class="font-bold text-xl">${user.fullName}</h3>
+                    <p class="text-sm opacity-80">${user.id}</p>
+                </div>
+                <div class="font-mono text-4xl font-bold tracking-tighter mr-4" data-timer-display="true">00:00:00.000</div>
+                <button onclick="deleteTimer('${user.id}')" class="delete-btn p-2 rounded-full hover:bg-red-700">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                </button>`;
+            activeTimersContainer.prepend(card);
+        }
+
+        window.deleteTimer = function(id) {
+            const card = document.getElementById(`timer-${id}`);
+            if (card) { card.remove(); }
+            activeTimers = activeTimers.filter(timer => timer.user.id !== id);
+            renderUserList(idInput.value.trim());
+            if (activeTimers.length === 0) {
+                 if (!document.getElementById('timerPlaceholder')) {
+                    activeTimersContainer.innerHTML = '<div id="timerPlaceholder" class="text-center text-gray-400 flex items-center justify-center h-full"><p>ยิงบาร์โค้ดเพื่อเริ่มนับเวลา...</p></div>';
+                 }
+                 cancelAnimationFrame(globalAnimationFrameId);
+                 globalAnimationFrameId = null;
+            }
+            saveState();
+        }
+
+        function globalAnimationLoop() {
+            const finishedTimerIds = [];
+            activeTimers.forEach(timer => {
+                const now = Date.now();
+                const elapsedTime = now - timer.startTime;
+                const timeLeftMs = timer.duration - elapsedTime;
+                const card = document.getElementById(`timer-${timer.user.id}`);
+                if (!card) return;
+                const display = card.querySelector('[data-timer-display]');
+                if (timeLeftMs > 0) {
+                    updateTimerDisplay(display, timeLeftMs);
+                } else {
+                    updateTimerDisplay(display, 0);
+                    card.classList.remove('bg-indigo-500');
+                    card.classList.add('bg-red-600');
+                    const deleteButton = card.querySelector('button');
+                    if(deleteButton) deleteButton.remove();
+                    const userInArray = allUsers.find(u => u.id === timer.user.id);
+                    if (userInArray && !userInArray.completed) {
+                        userInArray.completed = true;
+                        addToHistory(timer.user, 'หมดเวลา', timer.duration);
+                    }
+                    finishedTimerIds.push(timer.user.id);
+                }
+            });
+
+            if (finishedTimerIds.length > 0) {
+                activeTimers = activeTimers.filter(timer => !finishedTimerIds.includes(timer.user.id));
+                renderUserList(idInput.value.trim());
+                finishedTimerIds.forEach(id => {
+                    setTimeout(() => {
+                        const card = document.getElementById(`timer-${id}`);
+                        if (card) card.remove();
+                        if(activeTimers.length === 0 && !document.getElementById('timerPlaceholder')){
+                             activeTimersContainer.innerHTML = '<div id="timerPlaceholder" class="text-center text-gray-400 flex items-center justify-center h-full"><p>ยิงบาร์โค้ดเพื่อเริ่มนับเวลา...</p></div>';
+                        }
+                    }, 5000);
+                });
+                saveState(); 
+            }
+            if (activeTimers.length > 0) {
+                globalAnimationFrameId = requestAnimationFrame(globalAnimationLoop);
+            } else {
+                cancelAnimationFrame(globalAnimationFrameId);
+                globalAnimationFrameId = null;
+            }
+        }
+        
+        function startGlobalAnimationLoop() {
+            if (!globalAnimationFrameId) {
+                globalAnimationFrameId = requestAnimationFrame(globalAnimationLoop);
+            }
+        }
+
+        function updateTimerDisplay(element, ms) {
+            let totalSeconds = Math.floor(ms / 1000);
+            let hours = Math.floor(totalSeconds / 3600);
+            totalSeconds %= 3600;
+            let minutes = Math.floor(totalSeconds / 60);
+            let seconds = totalSeconds % 60;
+            let milliseconds = Math.floor(ms % 1000);
+            element.textContent = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}.${String(milliseconds).padStart(3, '0')}`;
+        }
+
+        function renderHistory() {
+            historyBody.innerHTML = '';
+            if (historyData.length === 0) {
+                historyBody.innerHTML = `<tr class="bg-white border-b"><td colspan="5" class="px-6 py-4 text-center">ยังไม่มีประวัติ</td></tr>`;
+                return;
+            }
+            historyData.forEach((entry, index) => {
+                const row = document.createElement('tr');
+                row.className = 'bg-white border-b';
+                const totalSeconds = Math.floor(entry.durationMs / 1000);
+                const timeFormatted = new Date(totalSeconds * 1000).toISOString().substr(11, 8);
+                
+                let completionTimeFormatted = '-';
+                if (entry.completionTime) {
+                    completionTimeFormatted = new Date(entry.completionTime).toLocaleTimeString('th-TH', {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        second: '2-digit'
+                    });
+                }
+
+                row.innerHTML = `
+                    <td class="px-6 py-4 font-medium text-gray-900">${historyData.length - index}</td>
+                    <td class="px-6 py-4">${entry.user.fullName}<br><span class="text-xs text-gray-500">${entry.user.id}</span></td>
+                    <td class="px-6 py-4">${timeFormatted}</td>
+                    <td class="px-6 py-4">${completionTimeFormatted}</td>
+                    <td class="px-6 py-4"><span class="bg-red-100 text-red-800 text-xs font-medium mr-2 px-2-5 py-0-5 rounded">${entry.status}</span></td>`;
+                historyBody.appendChild(row);
+            });
+        }
+        
+        function addToHistory(user, status, durationMs) {
+            const historyEntry = { user, status, durationMs, completionTime: new Date().toISOString() };
+            historyData.unshift(historyEntry);
+            renderHistory();
+            saveState();
+        }
+
+        function updateStatusMessage(message, type = 'info') {
+            statusText.textContent = message;
+            statusText.classList.remove('text-gray-500', 'text-red-600', 'text-green-600', 'font-bold');
+            
+            switch (type) {
+                case 'error': statusText.classList.add('text-red-600', 'font-bold'); break;
+                case 'success': statusText.classList.add('text-green-600'); break;
+                default: statusText.classList.add('text-gray-500'); break;
+            }
+
+            setTimeout(() => {
+                if (statusText.textContent === message) {
+                    statusText.textContent = 'กรุณายิงบาร์โค้ดเพื่อเริ่ม';
+                    statusText.classList.remove('text-red-600', 'text-green-600', 'font-bold');
+                    statusText.classList.add('text-gray-500');
+                }
+            }, 3000);
+        }
+
+        function parseCSV(text) {
+            if (text.charCodeAt(0) === 0xFEFF) text = text.slice(1);
+            
+            const rows = text.trim().split(/\r?\n/).slice(1);
+            return rows.map(row => {
+                const columns = row.split(',');
+                if (columns.length < 3) return null;
+                
+                const id = columns[0] ? columns[0].trim().replace(/"/g, '').replace(/\r/g, '') : '';
+                const fullName = columns[1] ? columns[1].trim().replace(/"/g, '').replace(/\r/g, '') : '';
+                const timeInSeconds = columns[2] ? columns[2].trim().replace(/"/g, '').replace(/\r/g, '') : '0';
+
+                if (/^\d{13}$/.test(id)) {
+                    return { id, fullName, timeInSeconds, completed: false };
+                }
+                return null;
+            }).filter(user => user !== null && user.id && user.fullName);
+        }
+
+        async function saveState() {
+            if (!appDataDocRef) return;
+            
+            const timersToSave = activeTimers.map(t => ({ id: t.user.id, endTime: t.startTime + t.duration }));
+            const completedUserIds = allUsers.filter(u => u.completed).map(u => u.id);
+
+            const dataToSave = {
+                activeTimers: timersToSave,
+                timerHistory: historyData,
+                completedUserIds: completedUserIds
+            };
+
+            try {
+                await setDoc(appDataDocRef, dataToSave);
+            } catch (error) {
+                console.error("Error saving state to Firestore:", error);
+            }
+        }
+        
+        function handleLogin() {
+            const user = usernameInput.value.trim();
+            const pass = passwordInput.value.trim();
+
+            if (user === '3013' && pass === '3215') {
+                sessionStorage.setItem('isLoggedIn', 'true');
+                loginScreen.classList.add('hidden');
+                appContainer.classList.remove('hidden');
+                main(); 
+            } else {
+                loginError.classList.remove('hidden');
+                loginScreen.querySelector('div').classList.add('shake');
+                setTimeout(() => {
+                    loginScreen.querySelector('div').classList.remove('shake');
+                }, 500);
+            }
+        }
+
+        // --- Event Listeners ---
+        loginBtn.addEventListener('click', handleLogin);
+        passwordInput.addEventListener('keypress', (event) => {
+            if (event.key === 'Enter') {
+                handleLogin();
+            }
+        });
+        
+        logoutBtn.addEventListener('click', () => {
+            sessionStorage.removeItem('isLoggedIn');
+            window.location.reload();
+        });
+
+        idInput.addEventListener('input', () => {
+            const value = idInput.value.trim();
+            renderUserList(value);
+            if (/^\d{13}$/.test(value)) {
+                startProcess(value);
+            }
+        });
+        
+        userList.addEventListener('click', (event) => {
+            const li = event.target.closest('li');
+            if (li) {
+                const id = li.dataset.id;
+                startProcess(id);
+            }
+        });
+
+        setDefaultTimeBtn.addEventListener('click', () => {
+            const h = parseInt(hoursInput.value) || 0;
+            const m = parseInt(minutesInput.value) || 0;
+            const s = parseInt(secondsInput.value) || 0;
+            sessionDefaultTimeInSeconds = (h * 3600) + (m * 60) + s;
+            updateStatusMessage(`ตั้งค่าเวลาเริ่มต้นเป็น ${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`, 'success');
+            idInput.focus();
+        });
+
+        resetAllBtn.addEventListener('click', () => {
+            if (document.getElementById('resetConfirmationDiv')) {
+                return; 
+            }
+
+            const confirmationDiv = document.createElement('div');
+            confirmationDiv.id = 'resetConfirmationDiv';
+            confirmationDiv.className = 'mt-4 p-4 bg-yellow-100 border border-yellow-300 rounded-lg';
+            
+            confirmationDiv.innerHTML = `
+                <label for="resetPasswordInput" class="block text-sm font-medium text-gray-700 mb-2">กรุณาใส่รหัส 3215 เพื่อยืนยันการรีเซ็ต</label>
+                <input type="password" id="resetPasswordInput" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                <div class="flex gap-2 mt-3">
+                    <button id="confirmResetBtn" class="flex-1 bg-red-600 text-white font-bold py-2 px-4 rounded-md hover:bg-red-700 transition">ยืนยัน</button>
+                    <button id="cancelResetBtn" class="flex-1 bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded-md hover:bg-gray-400 transition">ยกเลิก</button>
+                </div>
+            `;
+            
+            resetAllBtn.parentNode.insertBefore(confirmationDiv, resetAllBtn);
+            resetAllBtn.classList.add('hidden');
+
+            const confirmBtn = document.getElementById('confirmResetBtn');
+            const cancelBtn = document.getElementById('cancelResetBtn');
+            const passwordInput = document.getElementById('resetPasswordInput');
+            
+            passwordInput.focus();
+
+            const removeConfirmation = () => {
+                confirmationDiv.remove();
+                resetAllBtn.classList.remove('hidden');
+            };
+
+            confirmBtn.addEventListener('click', () => {
+                if (passwordInput.value === '3215') {
+                    if (appDataDocRef) {
+                        setDoc(appDataDocRef, {}).catch(err => console.error("Error clearing data:", err));
+                    }
+                    removeConfirmation();
+                } else {
+                    passwordInput.classList.add('input-error');
+                    passwordInput.value = '';
+                    passwordInput.placeholder = 'รหัสผ่านไม่ถูกต้อง!';
+                    setTimeout(() => {
+                        passwordInput.classList.remove('input-error');
+                        passwordInput.placeholder = '';
+                    }, 2000);
+                }
+            });
+
+            cancelBtn.addEventListener('click', () => {
+                removeConfirmation();
+            });
+        });
+
+    </script>
+</body>
+</html>
+
