@@ -16,23 +16,27 @@
         /* Style for the scrollbar */
         #userListContainer::-webkit-scrollbar,
         #historyContainer::-webkit-scrollbar,
-        #activeTimersContainer::-webkit-scrollbar {
+        #activeTimersContainer::-webkit-scrollbar,
+        .admin-history-container::-webkit-scrollbar {
             width: 8px;
         }
         #userListContainer::-webkit-scrollbar-track,
         #historyContainer::-webkit-scrollbar-track,
-        #activeTimersContainer::-webkit-scrollbar-track {
+        #activeTimersContainer::-webkit-scrollbar-track,
+        .admin-history-container::-webkit-scrollbar-track {
             background: #f1f1f1;
         }
         #userListContainer::-webkit-scrollbar-thumb,
         #historyContainer::-webkit-scrollbar-thumb,
-        #activeTimersContainer::-webkit-scrollbar-thumb {
+        #activeTimersContainer::-webkit-scrollbar-thumb,
+        .admin-history-container::-webkit-scrollbar-thumb {
             background: #888;
             border-radius: 4px;
         }
         #userListContainer::-webkit-scrollbar-thumb:hover,
         #historyContainer::-webkit-scrollbar-thumb:hover,
-        #activeTimersContainer::-webkit-scrollbar-thumb:hover {
+        #activeTimersContainer::-webkit-scrollbar-thumb:hover,
+        .admin-history-container::-webkit-scrollbar-thumb:hover {
             background: #555;
         }
         .timer-card {
@@ -82,37 +86,44 @@
         </div>
     </div>
 
+    <!-- User App Container -->
     <div id="appContainer" class="w-full max-w-screen-2xl mx-auto grid lg:grid-cols-5 gap-8 hidden">
         
         <!-- Column 1: Controls -->
         <div id="controlsColumn" class="bg-white p-6 rounded-xl shadow-lg flex flex-col lg:col-span-1">
-             <h2 class="text-xl font-bold text-gray-800 mb-4">ค้นหาและตั้งค่า</h2>
-            
-            <button id="logoutBtn" class="w-full mb-4 bg-gray-500 text-white font-bold py-2 px-4 rounded-md hover:bg-gray-600 transition">
-                ออกจากระบบ
-            </button>
-
-            <div class="bg-gray-100 p-2 rounded-lg mb-4">
-                <label class="block text-xs font-medium text-gray-700 mb-1">ตั้งค่าเวลาเริ่มต้น</label>
-                <div class="grid grid-cols-3 gap-1">
-                    <input type="number" id="hoursInput" placeholder="ชม." class="w-full p-1 border rounded-md text-center text-sm" min="0">
-                    <input type="number" id="minutesInput" placeholder="น." class="w-full p-1 border rounded-md text-center text-sm" min="0" max="59">
-                    <input type="number" id="secondsInput" placeholder="ว." class="w-full p-1 border rounded-md text-center text-sm" min="0" max="59">
+             <div class="mb-4">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-xl font-bold text-gray-800">ผู้ใช้งาน</h2>
+                    <button id="logoutBtn" class="text-xs bg-gray-200 text-gray-600 font-bold py-1 px-3 rounded-md hover:bg-gray-300 transition">
+                        ออกจากระบบ
+                    </button>
                 </div>
-                <button id="setDefaultTimeBtn" class="w-full mt-2 bg-green-600 text-white font-bold py-1 px-2 rounded-md hover:bg-green-700 transition text-sm">
-                    ตั้งค่าเวลา
+                <p class="text-indigo-600 font-bold" id="loggedInUserDisplay"></p>
+             </div>
+            
+            <div id="userControls">
+                <div class="bg-gray-100 p-2 rounded-lg mb-4">
+                    <label class="block text-xs font-medium text-gray-700 mb-1">ตั้งค่าเวลาเริ่มต้น</label>
+                    <div class="grid grid-cols-3 gap-1">
+                        <input type="number" id="hoursInput" placeholder="ชม." class="w-full p-1 border rounded-md text-center text-sm" min="0">
+                        <input type="number" id="minutesInput" placeholder="น." class="w-full p-1 border rounded-md text-center text-sm" min="0" max="59">
+                        <input type="number" id="secondsInput" placeholder="ว." class="w-full p-1 border rounded-md text-center text-sm" min="0" max="59">
+                    </div>
+                    <button id="setDefaultTimeBtn" class="w-full mt-2 bg-green-600 text-white font-bold py-1 px-2 rounded-md hover:bg-green-700 transition text-sm">
+                        ตั้งค่าเวลา
+                    </button>
+                </div>
+                
+                <input type="text" id="idInput" class="block w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-base mb-4 transition" placeholder="ยิงบาร์โค้ด หรือ ค้นหา...">
+                
+                <div id="userListContainer" class="flex-grow overflow-y-auto bg-gray-50 p-2 border rounded-lg min-h-[20rem]">
+                     <div id="listStatus" class="p-4 text-center"></div>
+                     <ul id="userList" class="space-y-1"></ul>
+                </div>
+                <button id="resetAllBtn" class="w-full mt-4 bg-red-600 text-white font-bold py-2 px-4 rounded-md hover:bg-red-700 transition">
+                    รีเซ็ตข้อมูลทั้งหมด
                 </button>
             </div>
-            
-            <input type="text" id="idInput" class="block w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-base mb-4 transition" placeholder="ยิงบาร์โค้ด หรือ ค้นหา...">
-            
-            <div id="userListContainer" class="flex-grow overflow-y-auto bg-gray-50 p-2 border rounded-lg min-h-[20rem]">
-                 <div id="listStatus" class="p-4 text-center"></div>
-                 <ul id="userList" class="space-y-1"></ul>
-            </div>
-            <button id="resetAllBtn" class="w-full mt-4 bg-red-600 text-white font-bold py-2 px-4 rounded-md hover:bg-red-700 transition">
-                รีเซ็ตข้อมูลทั้งหมด
-            </button>
         </div>
 
         <!-- Column 2: Active Timers -->
@@ -139,26 +150,49 @@
                             <th scope="col" class="px-6 py-3">เวลาตั้งค่า</th>
                             <th scope="col" class="px-6 py-3">เวลาที่ครบกำหนด</th>
                             <th scope="col" class="px-6 py-3">สถานะ</th>
+                            <th scope="col" class="px-6 py-3"><span class="sr-only">ลบ</span></th>
                         </tr>
                     </thead>
                     <tbody id="historyBody">
-                       <tr class="bg-white border-b"><td colspan="5" class="px-6 py-4 text-center">ยังไม่มีประวัติ</td></tr>
+                       <tr class="bg-white border-b"><td colspan="6" class="px-6 py-4 text-center">ยังไม่มีประวัติ</td></tr>
                     </tbody>
                 </table>
             </div>
         </div>
-        
+    </div>
+
+    <!-- Admin View -->
+    <div id="adminContainer" class="w-full max-w-screen-2xl mx-auto hidden">
+        <div class="flex justify-between items-center bg-white p-4 rounded-xl shadow-lg mb-8">
+             <div>
+                <h1 class="text-2xl font-bold text-gray-800">มุมมองผู้ดูแลระบบ - ประวัติทั้งหมด</h1>
+                <p class="text-indigo-600 font-bold" id="adminLoggedInUserDisplay"></p>
+            </div>
+            <button id="adminLogoutBtn" class="bg-gray-500 text-white font-bold py-2 px-4 rounded-md hover:bg-gray-600 transition">
+                ออกจากระบบ
+            </button>
+        </div>
+        <div id="adminGrid" class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6">
+            <!-- Admin columns will be generated here -->
+        </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, doc, collection, setDoc, onSnapshot, getDocs, updateDoc, deleteField } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // VVVVVVVV  วาง URL ของ Web App ที่คุณสร้างจาก Google Apps Script ตรงนี้ VVVVVVVV
         const appsScriptUrl = 'https://script.google.com/macros/s/AKfycbxElRMDT970Oxso1TL2dMeQLuUJDliRIEHE0xaRtcQa8XyWJbHhz1DRtHi9o-OXeCCW/exec';
         // ^^^^^^^^  วาง URL ของ Web App ที่คุณสร้างจาก Google Apps Script ตรงนี้ ^^^^^^^^
         
+        // --- User Credentials ---
+        const USER_CREDENTIALS = {
+            "user1": "pass1", "user2": "pass2", "user3": "pass3", "user4": "pass4", "user5": "pass5",
+            "admin": "adminpass"
+        };
+        const REGULAR_USERS = ["user1", "user2", "user3", "user4", "user5"];
+
         // Login Elements
         const loginScreen = document.getElementById('loginScreen');
         const usernameInput = document.getElementById('usernameInput');
@@ -166,6 +200,7 @@
         const loginBtn = document.getElementById('loginBtn');
         const loginError = document.getElementById('loginError');
         const logoutBtn = document.getElementById('logoutBtn');
+        const adminLogoutBtn = document.getElementById('adminLogoutBtn');
 
         // Main Page Elements
         const idInput = document.getElementById('idInput');
@@ -181,6 +216,10 @@
         const resetAllBtn = document.getElementById('resetAllBtn');
         const historyBody = document.getElementById('historyBody');
         const appContainer = document.getElementById('appContainer');
+        const adminContainer = document.getElementById('adminContainer');
+        const loggedInUserDisplay = document.getElementById('loggedInUserDisplay');
+        const adminLoggedInUserDisplay = document.getElementById('adminLoggedInUserDisplay');
+
 
         // App State
         let globalAnimationFrameId = null;
@@ -188,16 +227,16 @@
         let activeTimers = [];
         let historyData = [];
         let sessionDefaultTimeInSeconds = null;
+        let globalLocks = {}; // To store the global lock state
 
         // Sound Synthesizers
         let successSynth, errorSynth;
 
         // Firebase State
-        let db, auth;
-        let appDataDocRef;
-        let unsubscribe; 
+        let db;
+        let unsubscribeListeners = []; 
 
-        async function initializeFirebase(appId, firebaseConfig) {
+        async function initializeFirebase(appId, firebaseConfig, loggedInUser, isAdmin) {
             try {
                 if (!appId || !firebaseConfig) {
                      throw new Error("CONFIGURATION_MISSING");
@@ -205,11 +244,17 @@
                 
                 const app = initializeApp(firebaseConfig);
                 db = getFirestore(app);
-                auth = getAuth(app);
-
+                const auth = getAuth(app);
                 await signInAnonymously(auth);
                 
-                appDataDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'countdownData', 'appState');
+                if (isAdmin) {
+                    setupAdminListeners(appId);
+                } else {
+                    const globalStateDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'countdownData', 'globalState');
+                    setupGlobalStateListener(globalStateDocRef);
+                    const appDataDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'countdownData', loggedInUser);
+                    setupSnapshotListener(appDataDocRef);
+                }
                 
                 await fetchData();
 
@@ -217,28 +262,24 @@
                 console.error("Firebase Initialization Error:", error);
                 let errorTitle = "เกิดข้อผิดพลาดในการเชื่อมต่อฐานข้อมูล";
                 let errorMessage = `<p class="text-sm text-gray-700 mb-4">ไม่สามารถเริ่มต้นการเชื่อมต่อกับฐานข้อมูลได้ กรุณาตรวจสอบว่า Firebase Config ถูกต้อง</p>`;
-
                 if (error.code) { 
                      errorTitle = `เกิดข้อผิดพลาด: ${error.code}`;
                      errorMessage = `<p class="text-sm text-gray-700 mb-4">${error.message}</p>`;
                 }
                 
-                appContainer.innerHTML = `
-                    <div class="col-span-3 text-center bg-white p-8 rounded-xl shadow-lg">
-                        <h2 class="text-2xl font-bold text-red-600 mb-4">${errorTitle}</h2>
-                        ${errorMessage}
-                        <button onclick="window.location.reload();" class="mt-4 bg-blue-500 text-white font-bold py-2 px-4 rounded-md hover:bg-blue-600 transition">
-                            รีเฟรช
-                        </button>
-                    </div>
-                `;
+                appContainer.innerHTML = `<div class="col-span-3 text-center bg-white p-8 rounded-xl shadow-lg"><h2 class="text-2xl font-bold text-red-600 mb-4">${errorTitle}</h2>${errorMessage}<button onclick="window.location.reload();" class="mt-4 bg-blue-500 text-white font-bold py-2 px-4 rounded-md hover:bg-blue-600 transition">รีเฟรช</button></div>`;
             }
         }
 
         async function main() {
-            idInput.focus();
-            document.body.addEventListener('click', () => initializeAudio(), { once: true });
-            document.body.addEventListener('keydown', () => initializeAudio(), { once: true });
+            const loggedInUser = sessionStorage.getItem('loggedInUser');
+            const isAdmin = sessionStorage.getItem('isAdmin') === 'true';
+
+            if (!isAdmin) {
+                idInput.focus();
+                document.body.addEventListener('click', () => initializeAudio(), { once: true });
+                document.body.addEventListener('keydown', () => initializeAudio(), { once: true });
+            }
 
             const firebaseConfig = {
               apiKey: "AIzaSyC4KDnkJ_3Md1hHqr3pu5IxbDuSwUz7-vY",
@@ -252,117 +293,186 @@
             const appId = firebaseConfig.appId;
 
             if (!appId || !firebaseConfig.apiKey) {
-                appContainer.innerHTML = `
-                    <div class="col-span-3 text-center bg-white p-8 rounded-xl shadow-lg">
-                        <h2 class="text-2xl font-bold text-red-600 mb-4">ข้อผิดพลาดร้ายแรง</h2>
-                        <p class="text-sm text-gray-700 mb-4">ไม่พบ Firebase Config ในโค้ดของแอปพลิเคชัน</p>
-                    </div>
-                `;
+                const container = isAdmin ? adminContainer : appContainer;
+                container.innerHTML = `<div class="col-span-3 text-center bg-white p-8 rounded-xl shadow-lg"><h2 class="text-2xl font-bold text-red-600 mb-4">ข้อผิดพลาดร้ายแรง</h2><p class="text-sm text-gray-700 mb-4">ไม่พบ Firebase Config ในโค้ดของแอปพลิเคชัน</p></div>`;
                 return;
             }
             
-            await initializeFirebase(appId, firebaseConfig);
+            await initializeFirebase(appId, firebaseConfig, loggedInUser, isAdmin);
         }
 
         async function fetchData() {
-            idInput.disabled = true;
-            idInput.placeholder = "กำลังโหลดข้อมูล...";
-            listStatus.innerHTML = '<p class="text-gray-500">กำลังโหลดข้อมูล...</p>';
-            listStatus.classList.remove('hidden');
-            userList.classList.add('hidden');
+            if (sessionStorage.getItem('isAdmin') !== 'true') {
+                idInput.disabled = true;
+                idInput.placeholder = "กำลังโหลดข้อมูล...";
+                listStatus.innerHTML = '<p class="text-gray-500">กำลังโหลดข้อมูล...</p>';
+                listStatus.classList.remove('hidden');
+                userList.classList.add('hidden');
+            }
 
             try {
                 const response = await fetch(`${appsScriptUrl}?cachebust=${Date.now()}`);
-                if (!response.ok) {
-                    throw new Error(`ไม่สามารถเชื่อมต่อกับ Apps Script ได้: ${response.status} ${response.statusText}`);
-                }
+                if (!response.ok) throw new Error(`ไม่สามารถเชื่อมต่อกับ Apps Script ได้: ${response.status} ${response.statusText}`);
                 const data = await response.json();
-                if (data.status === 'error') {
-                    throw new Error(`Apps Script Error: ${data.message}`);
-                }
+                if (data.status === 'error') throw new Error(`Apps Script Error: ${data.message}`);
                 allUsers = data;
-
                 if (allUsers.length === 0) throw new Error('ไม่พบข้อมูลใน Google Sheet หรือไฟล์อาจจะว่างเปล่า');
 
-                idInput.disabled = false;
-                idInput.placeholder = "ยิงบาร์โค้ด หรือ ค้นหา...";
-                listStatus.classList.add('hidden');
-                userList.classList.remove('hidden');
+                if (sessionStorage.getItem('isAdmin') !== 'true') {
+                    idInput.disabled = false;
+                    idInput.placeholder = "ยิงบาร์โค้ด หรือ ค้นหา...";
+                    listStatus.classList.add('hidden');
+                    userList.classList.remove('hidden');
+                }
                 
-                setupSnapshotListener(); 
-
             } catch (error) {
                 console.error('Failed to load user list:', error);
-                idInput.placeholder = "ไม่สามารถโหลดรายชื่อได้";
-                
-                let errorTitle = "เกิดข้อผิดพลาดในการโหลดข้อมูล";
-                let errorMessage = `<p class="text-sm text-gray-700 mb-4">${error.message}</p>`;
-                
-                listStatus.innerHTML = `<div class="text-left"><p class="text-red-600 font-bold mb-2">${errorTitle}</p>${errorMessage}</div><button id="reloadBtn" class="mt-4 bg-blue-500 text-white font-bold py-2 px-4 rounded-md hover:bg-blue-600 transition">ลองอีกครั้ง</button>`;
-                listStatus.classList.remove('hidden');
-                document.getElementById('reloadBtn').addEventListener('click', fetchData);
+                if (sessionStorage.getItem('isAdmin') !== 'true') {
+                    idInput.placeholder = "ไม่สามารถโหลดรายชื่อได้";
+                    listStatus.innerHTML = `<div class="text-left"><p class="text-red-600 font-bold mb-2">เกิดข้อผิดพลาดในการโหลดข้อมูล</p><p class="text-sm text-gray-700 mb-4">${error.message}</p></div><button id="reloadBtn" class="mt-4 bg-blue-500 text-white font-bold py-2 px-4 rounded-md hover:bg-blue-600 transition">ลองอีกครั้ง</button>`;
+                    listStatus.classList.remove('hidden');
+                    document.getElementById('reloadBtn').addEventListener('click', fetchData);
+                }
             }
         }
+        
+        function setupGlobalStateListener(docRef) {
+            onSnapshot(docRef, (docSnap) => {
+                const data = docSnap.exists() ? docSnap.data() : {};
+                globalLocks = data.lockedIds || {};
+                renderUserList(idInput.value.trim()); 
+            });
+        }
 
-        function setupSnapshotListener() {
-            if (unsubscribe) unsubscribe();
-
-            unsubscribe = onSnapshot(appDataDocRef, (docSnap) => {
-                activeTimers.forEach(t => {
-                     const card = document.getElementById(`timer-${t.user.id}`);
-                     if (card) card.remove();
-                });
-                activeTimers = [];
-                historyData = [];
-                allUsers.forEach(u => u.completed = false);
-
-                if (docSnap.exists()) {
-                    const data = docSnap.data();
-                    historyData = data.timerHistory || [];
-                    const savedCompletedIds = data.completedUserIds || [];
-                    const savedTimers = data.activeTimers || [];
-                    
-                    savedCompletedIds.forEach(id => {
-                        const user = allUsers.find(u => u.id === id);
-                        if (user) user.completed = true;
-                    });
-                    
-                    const timerPlaceholderEl = document.getElementById('timerPlaceholder');
-                    if (savedTimers.length > 0 && timerPlaceholderEl) {
-                        timerPlaceholderEl.remove();
-                    }
-
-                    savedTimers.forEach(savedTimer => {
-                        const user = allUsers.find(u => u.id === savedTimer.id);
-                        if (user && !user.completed) {
-                             const timeLeftMs = savedTimer.endTime - Date.now();
-                             if (timeLeftMs > 0) {
-                                 const timerData = { user, startTime: Date.now(), duration: timeLeftMs };
-                                 activeTimers.push(timerData);
-                                 createTimerCard(user);
-                             }
-                        }
-                    });
-                }
-                
-                if (activeTimers.length > 0) startGlobalAnimationLoop();
-                else if (!document.getElementById('timerPlaceholder')) {
-                     activeTimersContainer.innerHTML = '<div id="timerPlaceholder" class="text-center text-gray-400 flex items-center justify-center h-full"><p>ยิงบาร์โค้ดเพื่อเริ่มนับเวลา...</p></div>';
-                }
-
-                renderHistory();
-                renderUserList(idInput.value.trim());
+        function setupSnapshotListener(docRef) {
+            unsubscribeListeners.forEach(unsub => unsub());
+            unsubscribeListeners = [];
+            const unsubscribe = onSnapshot(docRef, (docSnap) => {
+                const data = docSnap.exists() ? docSnap.data() : {};
+                updateLocalState(data);
+                renderUI();
             }, (error) => {
                 console.error("Firestore snapshot error:", error);
                 statusText.textContent = "การเชื่อมต่อข้อมูลขัดข้อง";
-                statusText.classList.add('text-red-600', 'font-bold');
+            });
+            unsubscribeListeners.push(unsubscribe);
+        }
+
+        function setupAdminListeners(appId) {
+            unsubscribeListeners.forEach(unsub => unsub());
+            unsubscribeListeners = [];
+
+            const adminGrid = document.getElementById('adminGrid');
+            adminGrid.innerHTML = ''; 
+
+            REGULAR_USERS.forEach(user => {
+                const userColumn = document.createElement('div');
+                userColumn.className = 'bg-white p-4 rounded-xl shadow-lg flex flex-col';
+                userColumn.innerHTML = `
+                    <h2 class="text-lg font-bold text-center mb-4 text-indigo-600">${user}</h2>
+                    <div class="flex-grow overflow-y-auto border rounded-lg h-[70vh] admin-history-container">
+                        <table class="w-full text-xs text-left text-gray-500">
+                            <thead class="text-xs text-gray-700 uppercase bg-gray-50 sticky top-0">
+                                <tr>
+                                    <th scope="col" class="px-2 py-2">#</th>
+                                    <th scope="col" class="px-2 py-2">ชื่อ-สกุล</th>
+                                    <th scope="col" class="px-2 py-2">เวลาครบกำหนด</th>
+                                </tr>
+                            </thead>
+                            <tbody id="historyBody-${user}">
+                                <tr><td colspan="3" class="p-4 text-center text-gray-400">กำลังโหลด...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+                adminGrid.appendChild(userColumn);
+            });
+
+            REGULAR_USERS.forEach(username => {
+                const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'countdownData', username);
+                const unsubscribe = onSnapshot(docRef, (docSnap) => {
+                    const userData = docSnap.exists() ? docSnap.data() : {};
+                    const historyData = userData.timerHistory || [];
+                    const tbody = document.getElementById(`historyBody-${username}`);
+                    if (tbody) {
+                        renderAdminHistoryForUser(tbody, historyData);
+                    }
+                });
+                unsubscribeListeners.push(unsubscribe);
             });
         }
         
-        function initializeAudio() {
-            if (Tone.context.state !== 'running') {
-                Tone.context.resume();
+        function renderAdminHistoryForUser(tbody, data) {
+            tbody.innerHTML = '';
+            if (data.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="3" class="p-4 text-center text-gray-400">ไม่มีประวัติ</td></tr>`;
+                return;
             }
+            data.forEach((entry, index) => {
+                const row = document.createElement('tr');
+                row.className = 'bg-white border-b';
+
+                let completionTimeFormatted = '-';
+                if (entry.completionTime) {
+                    completionTimeFormatted = new Date(entry.completionTime).toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                }
+
+                row.innerHTML = `
+                    <td class="px-2 py-2 font-medium text-gray-900">${data.length - index}</td>
+                    <td class="px-2 py-2">${entry.user.fullName}<br><span class="text-xs text-gray-400">${entry.user.id}</span></td>
+                    <td class="px-2 py-2">${completionTimeFormatted}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+        
+        function updateLocalState(data) {
+            activeTimers.forEach(t => {
+                const card = document.getElementById(`timer-${t.user.id}`);
+                if (card) card.remove();
+            });
+            activeTimers = [];
+            historyData = data.timerHistory || [];
+            allUsers.forEach(u => u.completed = false);
+
+            const savedCompletedIds = data.completedUserIds || [];
+            savedCompletedIds.forEach(id => {
+                const user = allUsers.find(u => u.id === id);
+                if (user) user.completed = true;
+            });
+
+            const savedTimers = data.activeTimers || [];
+            savedTimers.forEach(savedTimer => {
+                const user = allUsers.find(u => u.id === savedTimer.id);
+                if (user) {
+                     const timeLeftMs = savedTimer.endTime - Date.now();
+                     const timerData = { user, startTime: Date.now() - (savedTimer.duration - timeLeftMs), duration: savedTimer.duration, owner: savedTimer.owner };
+                     activeTimers.push(timerData);
+                }
+            });
+        }
+        
+        function renderUI() {
+             const timerPlaceholderEl = document.getElementById('timerPlaceholder');
+             if (timerPlaceholderEl && activeTimers.length > 0) {
+                 timerPlaceholderEl.remove();
+             } else if (!timerPlaceholderEl && activeTimers.length === 0) {
+                 activeTimersContainer.innerHTML = '<div id="timerPlaceholder" class="text-center text-gray-400 flex items-center justify-center h-full"><p>ยิงบาร์โค้ดเพื่อเริ่มนับเวลา...</p></div>';
+             }
+             
+             activeTimers.forEach(timer => {
+                 if(!document.getElementById(`timer-${timer.user.id}`)) {
+                    createTimerCard(timer.user, timer.owner);
+                 }
+             });
+
+             if (activeTimers.length > 0) startGlobalAnimationLoop();
+             renderHistory();
+             renderUserList(idInput.value.trim());
+        }
+        
+        function initializeAudio() {
+            if (Tone.context.state !== 'running') Tone.context.resume();
             if (!successSynth) successSynth = new Tone.Synth({ oscillator: { type: 'sine' }, envelope: { attack: 0.005, decay: 0.1, sustain: 0.3, release: 1 } }).toDestination();
             if (!errorSynth) errorSynth = new Tone.Synth({ oscillator: { type: 'square' }, envelope: { attack: 0.005, decay: 0.2, sustain: 0.1, release: 1 } }).toDestination();
         }
@@ -370,7 +480,17 @@
         window.onload = function() {
             if (sessionStorage.getItem('isLoggedIn') === 'true') {
                 loginScreen.classList.add('hidden');
-                appContainer.classList.remove('hidden');
+                const isAdmin = sessionStorage.getItem('isAdmin') === 'true';
+                const loggedInUser = sessionStorage.getItem('loggedInUser');
+                const container = isAdmin ? adminContainer : appContainer;
+                
+                if (isAdmin) {
+                    adminLoggedInUserDisplay.textContent = `ผู้ใช้: ${loggedInUser}`;
+                } else {
+                    loggedInUserDisplay.textContent = `ผู้ใช้: ${loggedInUser}`;
+                }
+
+                container.classList.remove('hidden');
                 main();
             } else {
                 usernameInput.focus();
@@ -379,25 +499,32 @@
         
         function renderUserList(filter = '') {
             userList.innerHTML = '';
-            if (!filter) return;
-
+            if (!filter) {
+                return; 
+            }
             const lowerCaseFilter = filter.toLowerCase();
-            const filteredUsers = allUsers.filter(user => 
-                user.fullName.toLowerCase().includes(lowerCaseFilter) || 
-                user.id.includes(filter)
-            );
+            const filteredUsers = allUsers.filter(user => user.fullName.toLowerCase().includes(lowerCaseFilter) || user.id.includes(filter));
             
             if (filteredUsers.length === 0) {
                  userList.innerHTML = `<div class="p-4 text-gray-500">ไม่พบรายชื่อที่ตรงกัน</div>`;
                  return;
             }
+
             filteredUsers.forEach(user => {
                 const li = document.createElement('li');
                 li.dataset.id = user.id;
                 let content = `<span class="font-bold">${user.fullName}</span><br><span class="text-sm text-gray-500">${user.id}</span>`;
                 let classes = 'p-3 rounded-md cursor-pointer hover:bg-indigo-100 transition-colors duration-150';
-                if (activeTimers.some(t => t.user.id === user.id)) classes = 'p-3 rounded-md text-white bg-blue-500';
-                else if (user.completed) {
+                
+                const loggedInUser = sessionStorage.getItem('loggedInUser');
+                const lockOwner = globalLocks[user.id];
+
+                if (lockOwner && lockOwner !== loggedInUser) {
+                    content = `<span class="font-bold">${user.fullName}</span><br><span class="text-sm">${user.id}</span><span class="float-right text-yellow-600 font-bold">ถูกนับโดย ${lockOwner}</span>`;
+                    classes = 'p-3 rounded-md text-gray-500 bg-yellow-100 cursor-not-allowed';
+                } else if (activeTimers.some(t => t.user.id === user.id)) {
+                    classes = 'p-3 rounded-md text-white bg-blue-500';
+                } else if (user.completed) {
                     content = `<span class="font-bold">${user.fullName}</span><br><span class="text-sm">${user.id}</span><span class="float-right text-green-600 font-bold">✔ เสร็จสิ้น</span>`;
                     classes = 'p-3 rounded-md text-gray-500 bg-green-100 line-through';
                 }
@@ -407,22 +534,35 @@
             });
         }
         
-        function startProcess(id) {
-            const record = allUsers.find(user => user.id === id);
-
-            if (activeTimers.some(timer => timer.user.id === id)) {
-                updateStatusMessage(`"${id}" กำลังนับเวลาอยู่แล้ว`, 'info');
+        async function startProcess(id) {
+            const loggedInUser = sessionStorage.getItem('loggedInUser');
+            const lockOwner = globalLocks[id];
+            
+            if (lockOwner && lockOwner !== loggedInUser) {
+                const record = allUsers.find(user => user.id === id);
+                updateStatusMessage(`'${record.fullName}' ถูกนับโดย ${lockOwner} แล้ว`, 'error');
+                if(errorSynth) errorSynth.triggerAttackRelease("C3", "8n");
+                idInput.value = '';
+                renderUserList(idInput.value.trim());
                 return;
             }
 
+            const record = allUsers.find(user => user.id === id);
+            if (activeTimers.some(timer => timer.user.id === id)) {
+                updateStatusMessage(`"${id}" กำลังนับเวลาอยู่แล้ว`, 'info'); return;
+            }
             if (record) {
                 if (record.completed) {
-                    updateStatusMessage(`"${record.fullName}" ได้นับเวลาไปแล้ว`, 'info');
-                    return;
+                    updateStatusMessage(`"${record.fullName}" ได้นับเวลาไปแล้ว`, 'info'); return;
                 }
                 if(successSynth) successSynth.triggerAttackRelease("C5", "8n");
-                timerPlaceholder = document.getElementById('timerPlaceholder');
-                if (timerPlaceholder) timerPlaceholder.remove();
+                
+                const appId = "1:1004453397450:web:83825d12550e8ecf940533";
+                const globalStateDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'countdownData', 'globalState');
+                await setDoc(globalStateDocRef, { lockedIds: { [id]: loggedInUser } }, { merge: true });
+
+                const timerPlaceholderEl = document.getElementById('timerPlaceholder');
+                if (timerPlaceholderEl) timerPlaceholderEl.remove();
                 const durationInSeconds = sessionDefaultTimeInSeconds !== null ? sessionDefaultTimeInSeconds : parseInt(record.timeInSeconds, 10);
                 const timerData = { user: record, startTime: Date.now(), duration: durationInSeconds * 1000 };
                 activeTimers.push(timerData);
@@ -438,32 +578,45 @@
                 setTimeout(() => idInput.classList.remove('input-error'), 1000);
             }
             idInput.value = '';
-            renderUserList('');
+            renderUserList(idInput.value.trim());
         }
         
-        function createTimerCard(user) {
+        function createTimerCard(user, owner) {
             const card = document.createElement('div');
             card.id = `timer-${user.id}`;
+            const ownerHtml = owner ? `<p class="text-xs opacity-70 mt-1">โดย: ${owner}</p>` : '';
             card.className = 'timer-card p-4 bg-indigo-500 text-white rounded-lg shadow-md flex justify-between items-center';
             card.innerHTML = `
                 <div class="flex-grow">
                     <h3 class="font-bold text-xl">${user.fullName}</h3>
                     <p class="text-sm opacity-80">${user.id}</p>
+                    ${ownerHtml}
                 </div>
                 <div class="font-mono text-4xl font-bold tracking-tighter mr-4" data-timer-display="true">00:00:00.000</div>
-                <button onclick="deleteTimer('${user.id}')" class="delete-btn p-2 rounded-full hover:bg-red-700">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                    </svg>
-                </button>`;
+                ${!owner ? `<button onclick="deleteTimer('${user.id}')" class="delete-btn p-2 rounded-full hover:bg-red-700"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24" 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg></button>` : ''}
+            `;
             activeTimersContainer.prepend(card);
         }
+        
+        async function removeGlobalLock(idToRemove) {
+            const appId = "1:1004453397450:web:83825d12550e8ecf940533";
+            const globalStateDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'countdownData', 'globalState');
+            await updateDoc(globalStateDocRef, { [`lockedIds.${idToRemove}`]: deleteField() });
+        }
 
-        window.deleteTimer = function(id) {
+        window.deleteTimer = async function(id) {
+            await removeGlobalLock(id);
+            
             const card = document.getElementById(`timer-${id}`);
-            if (card) { card.remove(); }
+            if (card) card.remove();
+            
             activeTimers = activeTimers.filter(timer => timer.user.id !== id);
+            
+            const userInArray = allUsers.find(u => u.id === id);
+            if (userInArray) userInArray.completed = false; // Allow re-timing after deletion
+
             renderUserList(idInput.value.trim());
+
             if (activeTimers.length === 0) {
                  if (!document.getElementById('timerPlaceholder')) {
                     activeTimersContainer.innerHTML = '<div id="timerPlaceholder" class="text-center text-gray-400 flex items-center justify-center h-full"><p>ยิงบาร์โค้ดเพื่อเริ่มนับเวลา...</p></div>';
@@ -475,7 +628,6 @@
         }
 
         function globalAnimationLoop() {
-            const finishedTimerIds = [];
             activeTimers.forEach(timer => {
                 const now = Date.now();
                 const elapsedTime = now - timer.startTime;
@@ -483,42 +635,27 @@
                 const card = document.getElementById(`timer-${timer.user.id}`);
                 if (!card) return;
                 const display = card.querySelector('[data-timer-display]');
+
                 if (timeLeftMs > 0) {
                     updateTimerDisplay(display, timeLeftMs);
                 } else {
                     updateTimerDisplay(display, 0);
                     card.classList.remove('bg-indigo-500');
                     card.classList.add('bg-red-600');
-                    const deleteButton = card.querySelector('button');
-                    if(deleteButton) deleteButton.remove();
+                    
                     const userInArray = allUsers.find(u => u.id === timer.user.id);
                     if (userInArray && !userInArray.completed) {
                         userInArray.completed = true;
                         addToHistory(timer.user, 'หมดเวลา', timer.duration);
                     }
-                    finishedTimerIds.push(timer.user.id);
                 }
             });
 
-            if (finishedTimerIds.length > 0) {
-                activeTimers = activeTimers.filter(timer => !finishedTimerIds.includes(timer.user.id));
-                renderUserList(idInput.value.trim());
-                finishedTimerIds.forEach(id => {
-                    setTimeout(() => {
-                        const card = document.getElementById(`timer-${id}`);
-                        if (card) card.remove();
-                        if(activeTimers.length === 0 && !document.getElementById('timerPlaceholder')){
-                             activeTimersContainer.innerHTML = '<div id="timerPlaceholder" class="text-center text-gray-400 flex items-center justify-center h-full"><p>ยิงบาร์โค้ดเพื่อเริ่มนับเวลา...</p></div>';
-                        }
-                    }, 5000);
-                });
-                saveState(); 
-            }
-            if (activeTimers.length > 0) {
-                globalAnimationFrameId = requestAnimationFrame(globalAnimationLoop);
+            if (activeTimers.some(t => t.startTime + t.duration - Date.now() > 0)) {
+                 globalAnimationFrameId = requestAnimationFrame(globalAnimationLoop);
             } else {
-                cancelAnimationFrame(globalAnimationFrameId);
-                globalAnimationFrameId = null;
+                 cancelAnimationFrame(globalAnimationFrameId);
+                 globalAnimationFrameId = null;
             }
         }
         
@@ -538,10 +675,10 @@
             element.textContent = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}.${String(milliseconds).padStart(3, '0')}`;
         }
 
-        function renderHistory() {
+        function renderHistory(isAdminView = false) {
             historyBody.innerHTML = '';
             if (historyData.length === 0) {
-                historyBody.innerHTML = `<tr class="bg-white border-b"><td colspan="5" class="px-6 py-4 text-center">ยังไม่มีประวัติ</td></tr>`;
+                historyBody.innerHTML = `<tr class="bg-white border-b"><td colspan="6" class="px-6 py-4 text-center">ยังไม่มีประวัติ</td></tr>`;
                 return;
             }
             historyData.forEach((entry, index) => {
@@ -549,31 +686,30 @@
                 row.className = 'bg-white border-b';
                 const totalSeconds = Math.floor(entry.durationMs / 1000);
                 const timeFormatted = new Date(totalSeconds * 1000).toISOString().substr(11, 8);
+                const ownerHtml = isAdminView ? `<span class="text-xs text-gray-400">(${entry.owner || 'N/A'})</span>` : '';
                 
                 let completionTimeFormatted = '-';
                 if (entry.completionTime) {
-                    completionTimeFormatted = new Date(entry.completionTime).toLocaleTimeString('th-TH', {
-                        hour: '2-digit',
-                        minute: '2-digit',
-                        second: '2-digit'
-                    });
+                    completionTimeFormatted = new Date(entry.completionTime).toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
                 }
 
-                row.innerHTML = `
-                    <td class="px-6 py-4 font-medium text-gray-900">${historyData.length - index}</td>
-                    <td class="px-6 py-4">${entry.user.fullName}<br><span class="text-xs text-gray-500">${entry.user.id}</span></td>
-                    <td class="px-6 py-4">${timeFormatted}</td>
-                    <td class="px-6 py-4">${completionTimeFormatted}</td>
-                    <td class="px-6 py-4"><span class="bg-red-100 text-red-800 text-xs font-medium mr-2 px-2-5 py-0-5 rounded">${entry.status}</span></td>`;
+                row.innerHTML = `<td class="px-6 py-4 font-medium text-gray-900">${historyData.length - index}</td><td class="px-6 py-4">${entry.user.fullName} ${ownerHtml}<br><span class="text-xs text-gray-500">${entry.user.id}</span></td><td class="px-6 py-4">${timeFormatted}</td><td class="px-6 py-4">${completionTimeFormatted}</td><td class="px-6 py-4"><span class="bg-red-100 text-red-800 text-xs font-medium mr-2 px-2-5 py-0-5 rounded">${entry.status}</span></td><td class="px-6 py-4 text-right"><button onclick="deleteHistoryItem('${entry.completionTime}')" class="text-red-500 hover:text-red-700"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg></button></td>`;
                 historyBody.appendChild(row);
             });
         }
         
+        window.deleteHistoryItem = function(completionTime) {
+            historyData = historyData.filter(item => item.completionTime !== completionTime);
+            saveState();
+        }
+
         function addToHistory(user, status, durationMs) {
             const historyEntry = { user, status, durationMs, completionTime: new Date().toISOString() };
             historyData.unshift(historyEntry);
             renderHistory();
-            saveState();
+            if (sessionStorage.getItem('isAdmin') !== 'true') {
+                saveState();
+            }
         }
 
         function updateStatusMessage(message, type = 'info') {
@@ -597,16 +733,13 @@
 
         function parseCSV(text) {
             if (text.charCodeAt(0) === 0xFEFF) text = text.slice(1);
-            
             const rows = text.trim().split(/\r?\n/).slice(1);
             return rows.map(row => {
                 const columns = row.split(',');
                 if (columns.length < 3) return null;
-                
                 const id = columns[0] ? columns[0].trim().replace(/"/g, '').replace(/\r/g, '') : '';
                 const fullName = columns[1] ? columns[1].trim().replace(/"/g, '').replace(/\r/g, '') : '';
                 const timeInSeconds = columns[2] ? columns[2].trim().replace(/"/g, '').replace(/\r/g, '') : '0';
-
                 if (/^\d{13}$/.test(id)) {
                     return { id, fullName, timeInSeconds, completed: false };
                 }
@@ -615,9 +748,13 @@
         }
 
         async function saveState() {
-            if (!appDataDocRef) return;
+            const loggedInUser = sessionStorage.getItem('loggedInUser');
+            if (!db || !loggedInUser || loggedInUser === 'admin') return;
+
+            const appId = "1:1004453397450:web:83825d12550e8ecf940533";
+            const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'countdownData', loggedInUser);
             
-            const timersToSave = activeTimers.map(t => ({ id: t.user.id, endTime: t.startTime + t.duration }));
+            const timersToSave = activeTimers.map(t => ({ id: t.user.id, endTime: t.startTime + t.duration, duration: t.duration }));
             const completedUserIds = allUsers.filter(u => u.completed).map(u => u.id);
 
             const dataToSave = {
@@ -627,7 +764,7 @@
             };
 
             try {
-                await setDoc(appDataDocRef, dataToSave);
+                await setDoc(docRef, dataToSave);
             } catch (error) {
                 console.error("Error saving state to Firestore:", error);
             }
@@ -637,10 +774,15 @@
             const user = usernameInput.value.trim();
             const pass = passwordInput.value.trim();
 
-            if (user === '3013' && pass === '3215') {
+            if (USER_CREDENTIALS[user] && USER_CREDENTIALS[user] === pass) {
                 sessionStorage.setItem('isLoggedIn', 'true');
+                sessionStorage.setItem('loggedInUser', user);
+                if (user === 'admin') {
+                    sessionStorage.setItem('isAdmin', 'true');
+                }
                 loginScreen.classList.add('hidden');
-                appContainer.classList.remove('hidden');
+                const container = user === 'admin' ? adminContainer : appContainer;
+                container.classList.remove('hidden');
                 main(); 
             } else {
                 loginError.classList.remove('hidden');
@@ -654,13 +796,15 @@
         // --- Event Listeners ---
         loginBtn.addEventListener('click', handleLogin);
         passwordInput.addEventListener('keypress', (event) => {
-            if (event.key === 'Enter') {
-                handleLogin();
-            }
+            if (event.key === 'Enter') handleLogin();
         });
         
         logoutBtn.addEventListener('click', () => {
-            sessionStorage.removeItem('isLoggedIn');
+            sessionStorage.clear();
+            window.location.reload();
+        });
+        adminLogoutBtn.addEventListener('click', () => {
+            sessionStorage.clear();
             window.location.reload();
         });
 
@@ -674,10 +818,7 @@
         
         userList.addEventListener('click', (event) => {
             const li = event.target.closest('li');
-            if (li) {
-                const id = li.dataset.id;
-                startProcess(id);
-            }
+            if (li) startProcess(li.dataset.id);
         });
 
         setDefaultTimeBtn.addEventListener('click', () => {
@@ -690,22 +831,13 @@
         });
 
         resetAllBtn.addEventListener('click', () => {
-            if (document.getElementById('resetConfirmationDiv')) {
-                return; 
-            }
+            if (document.getElementById('resetConfirmationDiv')) return;
 
             const confirmationDiv = document.createElement('div');
             confirmationDiv.id = 'resetConfirmationDiv';
             confirmationDiv.className = 'mt-4 p-4 bg-yellow-100 border border-yellow-300 rounded-lg';
             
-            confirmationDiv.innerHTML = `
-                <label for="resetPasswordInput" class="block text-sm font-medium text-gray-700 mb-2">กรุณาใส่รหัส 3215 เพื่อยืนยันการรีเซ็ต</label>
-                <input type="password" id="resetPasswordInput" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
-                <div class="flex gap-2 mt-3">
-                    <button id="confirmResetBtn" class="flex-1 bg-red-600 text-white font-bold py-2 px-4 rounded-md hover:bg-red-700 transition">ยืนยัน</button>
-                    <button id="cancelResetBtn" class="flex-1 bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded-md hover:bg-gray-400 transition">ยกเลิก</button>
-                </div>
-            `;
+            confirmationDiv.innerHTML = `<label for="resetPasswordInput" class="block text-sm font-medium text-gray-700 mb-2">กรุณาใส่รหัส 3215 เพื่อยืนยันการรีเซ็ต</label><input type="password" id="resetPasswordInput" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"><div class="flex gap-2 mt-3"><button id="confirmResetBtn" class="flex-1 bg-red-600 text-white font-bold py-2 px-4 rounded-md hover:bg-red-700 transition">ยืนยัน</button><button id="cancelResetBtn" class="flex-1 bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded-md hover:bg-gray-400 transition">ยกเลิก</button></div>`;
             
             resetAllBtn.parentNode.insertBefore(confirmationDiv, resetAllBtn);
             resetAllBtn.classList.add('hidden');
@@ -713,7 +845,6 @@
             const confirmBtn = document.getElementById('confirmResetBtn');
             const cancelBtn = document.getElementById('cancelResetBtn');
             const passwordInput = document.getElementById('resetPasswordInput');
-            
             passwordInput.focus();
 
             const removeConfirmation = () => {
@@ -721,11 +852,30 @@
                 resetAllBtn.classList.remove('hidden');
             };
 
-            confirmBtn.addEventListener('click', () => {
+            confirmBtn.addEventListener('click', async () => {
                 if (passwordInput.value === '3215') {
-                    if (appDataDocRef) {
-                        setDoc(appDataDocRef, {}).catch(err => console.error("Error clearing data:", err));
+                    const loggedInUser = sessionStorage.getItem('loggedInUser');
+                    const appId = "1:1004453397450:web:83825d12550e8ecf940533";
+
+                    const locksToRemove = {};
+                    activeTimers.forEach(timer => {
+                        locksToRemove[`lockedIds.${timer.user.id}`] = deleteField();
+                    });
+
+                    if (Object.keys(locksToRemove).length > 0) {
+                        const globalStateDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'countdownData', 'globalState');
+                        try {
+                            await updateDoc(globalStateDocRef, locksToRemove);
+                        } catch (err) {
+                            console.error("Error clearing global locks:", err);
+                        }
                     }
+
+                    const userDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'countdownData', loggedInUser);
+                    if (userDocRef) {
+                       await setDoc(userDocRef, {});
+                    }
+                    
                     removeConfirmation();
                 } else {
                     passwordInput.classList.add('input-error');
@@ -738,9 +888,7 @@
                 }
             });
 
-            cancelBtn.addEventListener('click', () => {
-                removeConfirmation();
-            });
+            cancelBtn.addEventListener('click', removeConfirmation);
         });
 
     </script>
