@@ -1054,6 +1054,7 @@
             readerLoading.classList.remove('hidden');
             document.getElementById('reader').innerHTML = '';
 
+            // Use a timeout to allow the modal to render before initializing the camera
             setTimeout(() => {
                 if (html5Qrcode) {
                     html5Qrcode.clear().catch(e => {});
@@ -1159,4 +1160,5 @@
     </script>
 </body>
 </html>
+
 
