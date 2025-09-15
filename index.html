@@ -6,7 +6,7 @@
     <title>ระบบนับเวลาพร้อมกันหลายคน</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.js"></script>
-    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/dist/html5-qrcode.min.js" type="text/javascript"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap" rel="stylesheet">
@@ -1064,7 +1064,13 @@
                 })
                 .catch(err => {
                     console.error("Unable to start scanning.", err);
-                    showNotification('เกิดข้อผิดพลาด', `ไม่สามารถเปิดกล้องได้: ${err}`);
+                    let errorMessage = `ไม่สามารถเปิดกล้องได้: ${err.name || err}`;
+                    if (err.name === "NotAllowedError") {
+                        errorMessage = "กรุณาอนุญาตให้เว็บเบราว์เซอร์เข้าถึงกล้องของคุณ";
+                    } else if (err.name === "NotFoundError") {
+                        errorMessage = "ไม่พบกล้องในอุปกรณ์ของคุณ";
+                    }
+                    showNotification('เกิดข้อผิดพลาด', errorMessage);
                     scannerModal.classList.add('hidden');
                 });
         });
