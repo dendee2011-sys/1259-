@@ -1052,41 +1052,43 @@
             
             scannerModal.classList.remove('hidden');
             readerLoading.classList.remove('hidden');
-
-            if (html5Qrcode && html5Qrcode.isScanning) {
-                return;
-            }
-
             document.getElementById('reader').innerHTML = '';
-            html5Qrcode = new Html5Qrcode("reader", { verbose: false });
 
-            const config = { 
-                fps: 10, 
-                qrbox: { width: 250, height: 250 },
-                rememberLastUsedCamera: true
-            };
-
-            const onScanSuccess = (decodedText, decodedResult) => {
-                if (/^\d+$/.test(decodedText)) {
-                    closeScannerBtn.click(); 
-                    startProcess(decodedText);
+            setTimeout(() => {
+                if (html5Qrcode) {
+                    html5Qrcode.clear().catch(e => {});
                 }
-            };
+                
+                html5Qrcode = new Html5Qrcode("reader", { verbose: false });
 
-            html5Qrcode.start(
-                { facingMode: "environment" },
-                config,
-                onScanSuccess,
-                (errorMessage) => { /* ignore */ }
-            )
-            .then(() => {
-                readerLoading.classList.add('hidden');
-            })
-            .catch((err) => {
-                console.error(`Unable to start scanning, error: ${err}`);
-                showNotification('เกิดข้อผิดพลาด', `ไม่สามารถเริ่มการสแกนได้: กรุณาตรวจสอบว่าคุณได้อนุญาตให้เบราว์เซอร์เข้าถึงกล้องแล้ว`);
-                scannerModal.classList.add('hidden');
-            });
+                const config = { 
+                    fps: 10, 
+                    qrbox: { width: 250, height: 250 },
+                    rememberLastUsedCamera: true
+                };
+
+                const onScanSuccess = (decodedText, decodedResult) => {
+                    if (/^\d+$/.test(decodedText)) {
+                        closeScannerBtn.click(); 
+                        startProcess(decodedText);
+                    }
+                };
+
+                html5Qrcode.start(
+                    { facingMode: "environment" },
+                    config,
+                    onScanSuccess,
+                    (errorMessage) => { /* ignore */ }
+                )
+                .then(() => {
+                    readerLoading.classList.add('hidden');
+                })
+                .catch((err) => {
+                    console.error(`Unable to start scanning, error: ${err}`);
+                    showNotification('เกิดข้อผิดพลาด', `ไม่สามารถเริ่มการสแกนได้: กรุณาตรวจสอบว่าคุณได้อนุญาตให้เบราว์เซอร์เข้าถึงกล้องแล้ว`);
+                    closeScannerBtn.click();
+                });
+            }, 100); 
         });
 
         closeScannerBtn.addEventListener('click', async () => {
