@@ -1041,32 +1041,33 @@
         
         scanBtn.addEventListener('click', () => {
             scannerModal.classList.remove('hidden');
+            document.getElementById('reader').innerHTML = ''; // Clear the container
 
-            if (!html5Qrcode) {
-                // Pass true for verbose logging to the console.
-                html5Qrcode = new Html5Qrcode("reader", true);
-            }
+            // Always create a new instance for robustness, especially on mobile.
+            // Set verbose to false to avoid flooding the console.
+            html5Qrcode = new Html5Qrcode("reader", { verbose: false });
 
             const config = { fps: 10, qrbox: { width: 250, height: 250 } };
 
             const onScanSuccess = (decodedText, decodedResult) => {
-                if (html5Qrcode.isScanning) {
-                    html5Qrcode.stop().then(() => {
-                        scannerModal.classList.add('hidden');
-                        if (/^\d{13}$/.test(decodedText)) {
+                // We are looking for any sequence of numbers.
+                if (/^\d+$/.test(decodedText)) {
+                    if (html5Qrcode && html5Qrcode.isScanning) {
+                        // Stop the scanner and process the result.
+                        html5Qrcode.stop().then(() => {
+                            scannerModal.classList.add('hidden');
                             startProcess(decodedText);
-                        } else {
-                            updateStatusMessage('บาร์โค้ดไม่ถูกต้อง (ต้องเป็นเลข 13 หลัก)', 'error');
-                        }
-                    }).catch(err => {
-                        console.error("Failed to stop scanner after success", err);
-                        scannerModal.classList.add('hidden');
-                    });
+                        }).catch(err => {
+                            console.error("Failed to stop scanner after success", err);
+                            scannerModal.classList.add('hidden');
+                        });
+                    }
                 }
+                // If the scanned code is not purely numeric, we ignore it and let the scanner continue.
             };
             
             const onScanFailure = (error) => {
-                // This callback is called frequently, so we'll ignore it to avoid spamming the console.
+                // This callback is called frequently, so we don't do anything here.
             };
 
             // First, check for camera permissions and availability.
@@ -1101,9 +1102,20 @@
         closeScannerBtn.addEventListener('click', () => {
             if (html5Qrcode && html5Qrcode.isScanning) {
                 html5Qrcode.stop()
-                    .catch(err => console.error("Failed to stop scanner on close", err));
+                    .then(() => {
+                        // Success
+                    })
+                    .catch(err => {
+                        console.error("Failed to stop scanner on close button click.", err);
+                    })
+                    .finally(() => {
+                        // Always hide the modal and clear the reader
+                        scannerModal.classList.add('hidden');
+                        document.getElementById('reader').innerHTML = '';
+                    });
+            } else {
+                scannerModal.classList.add('hidden');
             }
-            scannerModal.classList.add('hidden');
         });
 
         downloadExcelBtn.addEventListener('click', () => {
@@ -1161,4 +1173,5 @@
     </script>
 </body>
 </html>
+
 
