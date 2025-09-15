@@ -43,13 +43,6 @@
         .timer-card {
             transition: all 0.3s ease;
         }
-        .delete-btn {
-            opacity: 0.5;
-            transition: opacity 0.2s ease;
-        }
-        .timer-card:hover .delete-btn {
-            opacity: 1;
-        }
         .input-error {
             border-color: #ef4444;
             box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.4);
@@ -98,43 +91,43 @@
         <!-- Column 1: Controls -->
         <div id="controlsColumn" class="bg-white p-6 rounded-xl shadow-lg flex flex-col lg:col-span-1">
              <div class="mb-4">
-                <div class="flex justify-between items-center">
-                    <h2 class="text-xl font-bold text-gray-800">ผู้ใช้งาน</h2>
-                    <button id="logoutBtn" class="text-xs bg-gray-200 text-gray-600 font-bold py-1 px-3 rounded-md hover:bg-gray-300 transition">
-                        ออกจากระบบ
-                    </button>
-                </div>
-                <p class="text-indigo-600 font-bold" id="loggedInUserDisplay"></p>
+                 <div class="flex justify-between items-center">
+                     <h2 class="text-xl font-bold text-gray-800">ผู้ใช้งาน</h2>
+                     <button id="logoutBtn" class="text-xs bg-gray-200 text-gray-600 font-bold py-1 px-3 rounded-md hover:bg-gray-300 transition">
+                         ออกจากระบบ
+                     </button>
+                 </div>
+                 <p class="text-indigo-600 font-bold" id="loggedInUserDisplay"></p>
              </div>
             
-            <div id="userControls">
-                <div class="bg-gray-100 p-2 rounded-lg mb-4">
-                    <label class="block text-xs font-medium text-gray-700 mb-1">ตั้งค่าเวลาเริ่มต้น</label>
-                    <div class="grid grid-cols-3 gap-1">
-                        <input type="number" id="hoursInput" placeholder="ชม." class="w-full p-1 border rounded-md text-center text-sm" min="0">
-                        <input type="number" id="minutesInput" placeholder="น." class="w-full p-1 border rounded-md text-center text-sm" min="0" max="59">
-                        <input type="number" id="secondsInput" placeholder="ว." class="w-full p-1 border rounded-md text-center text-sm" min="0" max="59">
-                    </div>
-                    <button id="setDefaultTimeBtn" class="w-full mt-2 bg-green-600 text-white font-bold py-1 px-2 rounded-md hover:bg-green-700 transition text-sm">
-                        ตั้งค่าเวลา
-                    </button>
-                </div>
+             <div id="userControls">
+                 <div class="bg-gray-100 p-2 rounded-lg mb-4">
+                     <label class="block text-xs font-medium text-gray-700 mb-1">ตั้งค่าเวลาเริ่มต้น</label>
+                     <div class="grid grid-cols-3 gap-1">
+                         <input type="number" id="hoursInput" placeholder="ชม." class="w-full p-1 border rounded-md text-center text-sm" min="0">
+                         <input type="number" id="minutesInput" placeholder="น." class="w-full p-1 border rounded-md text-center text-sm" min="0" max="59">
+                         <input type="number" id="secondsInput" placeholder="ว." class="w-full p-1 border rounded-md text-center text-sm" min="0" max="59">
+                     </div>
+                     <button id="setDefaultTimeBtn" class="w-full mt-2 bg-green-600 text-white font-bold py-1 px-2 rounded-md hover:bg-green-700 transition text-sm">
+                         ตั้งค่าเวลา
+                     </button>
+                 </div>
                 
-                <div class="flex items-center gap-2 mb-4">
-                    <input type="text" id="idInput" class="block w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-base transition" placeholder="ยิงบาร์โค้ด หรือ ค้นหา...">
-                    <button id="scanBtn" class="p-2.5 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4 2a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2V4a2 2 0 00-2-2H4zm10.5 4a.5.5 0 00-.5-.5h-3a.5.5 0 000 1h3a.5.5 0 00.5-.5zM4 8a.5.5 0 01.5-.5h11a.5.5 0 010 1h-11A.5.5 0 014 8zm0 2a.5.5 0 01.5-.5h5a.5.5 0 010 1h-5A.5.5 0 014 10zm11.5 2.5a.5.5 0 00-.5-.5h-3a.5.5 0 000 1h3a.5.5 0 00.5-.5zM4 14a.5.5 0 01.5-.5h11a.5.5 0 010 1h-11a.5.5 0 01-.5-.5z" clip-rule="evenodd" /></svg>
-                    </button>
-                </div>
+                 <div class="flex items-center gap-2 mb-4">
+                     <input type="text" id="idInput" class="block w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-base transition" placeholder="ยิงบาร์โค้ด หรือ ค้นหา...">
+                     <button id="scanBtn" class="p-2.5 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition">
+                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4 2a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2V4a2 2 0 00-2-2H4zm10.5 4a.5.5 0 00-.5-.5h-3a.5.5 0 000 1h3a.5.5 0 00.5-.5zM4 8a.5.5 0 01.5-.5h11a.5.5 0 010 1h-11A.5.5 0 014 8zm0 2a.5.5 0 01.5-.5h5a.5.5 0 010 1h-5A.5.5 0 014 10zm11.5 2.5a.5.5 0 00-.5-.5h-3a.5.5 0 000 1h3a.5.5 0 00.5-.5zM4 14a.5.5 0 01.5-.5h11a.5.5 0 010 1h-11a.5.5 0 01-.5-.5z" clip-rule="evenodd" /></svg>
+                     </button>
+                 </div>
 
-                <div id="userListContainer" class="flex-grow overflow-y-auto bg-gray-50 p-2 border rounded-lg min-h-[20rem]">
-                     <div id="listStatus" class="p-4 text-center"></div>
-                     <ul id="userList" class="space-y-1"></ul>
-                </div>
-                <button id="resetAllBtn" class="w-full mt-4 bg-red-600 text-white font-bold py-2 px-4 rounded-md hover:bg-red-700 transition">
-                    รีเซ็ตข้อมูลทั้งหมด
-                </button>
-            </div>
+                 <div id="userListContainer" class="flex-grow overflow-y-auto bg-gray-50 p-2 border rounded-lg min-h-[20rem]">
+                      <div id="listStatus" class="p-4 text-center"></div>
+                      <ul id="userList" class="space-y-1"></ul>
+                 </div>
+                 <button id="resetAllBtn" class="w-full mt-4 bg-red-600 text-white font-bold py-2 px-4 rounded-md hover:bg-red-700 transition">
+                     รีเซ็ตข้อมูลทั้งหมด
+                 </button>
+             </div>
         </div>
 
         <!-- Column 2: Active Timers -->
@@ -176,17 +169,17 @@
     <div id="adminContainer" class="w-full max-w-screen-2xl mx-auto hidden">
         <div class="flex justify-between items-center bg-white p-4 rounded-xl shadow-lg mb-8">
              <div>
-                <h1 class="text-2xl font-bold text-gray-800">มุมมองผู้ดูแลระบบ - ประวัติทั้งหมด</h1>
-                <p class="text-indigo-600 font-bold" id="adminLoggedInUserDisplay"></p>
-            </div>
-            <div class="flex items-center gap-4">
-                <button id="downloadExcelBtn" class="bg-green-600 text-white font-bold py-2 px-4 rounded-md hover:bg-green-700 transition">
-                    ดาวน์โหลด Excel
-                </button>
-                <button id="adminLogoutBtn" class="bg-gray-500 text-white font-bold py-2 px-4 rounded-md hover:bg-gray-600 transition">
-                    ออกจากระบบ
-                </button>
-            </div>
+                 <h1 class="text-2xl font-bold text-gray-800">มุมมองผู้ดูแลระบบ - ประวัติทั้งหมด</h1>
+                 <p class="text-indigo-600 font-bold" id="adminLoggedInUserDisplay"></p>
+             </div>
+             <div class="flex items-center gap-4">
+                 <button id="downloadExcelBtn" class="bg-green-600 text-white font-bold py-2 px-4 rounded-md hover:bg-green-700 transition">
+                     ดาวน์โหลด Excel
+                 </button>
+                 <button id="adminLogoutBtn" class="bg-gray-500 text-white font-bold py-2 px-4 rounded-md hover:bg-gray-600 transition">
+                     ออกจากระบบ
+                 </button>
+             </div>
         </div>
         <div id="adminGrid" class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6">
             <!-- Admin columns will be generated here -->
@@ -204,10 +197,22 @@
         </div>
     </div>
 
+    <!-- Notification Modal -->
+    <div id="notificationModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white p-6 rounded-lg shadow-xl w-full max-w-sm text-center">
+            <h3 id="notificationTitle" class="text-lg font-bold text-gray-800 mb-2"></h3>
+            <p id="notificationMessage" class="text-gray-600 mb-4"></p>
+            <button id="notificationCloseBtn" class="bg-indigo-600 text-white font-bold py-2 px-6 rounded-md hover:bg-indigo-700">
+                ตกลง
+            </button>
+        </div>
+    </div>
+
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, collection, setDoc, onSnapshot, getDocs, updateDoc, deleteField } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, onSnapshot, updateDoc, deleteField } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // VVVVVVVV  วาง URL ของ Web App ที่คุณสร้างจาก Google Apps Script ตรงนี้ VVVVVVVV
         const appsScriptUrl = 'https://script.google.com/macros/s/AKfycbxElRMDT970Oxso1TL2dMeQLuUJDliRIEHE0xaRtcQa8XyWJbHhz1DRtHi9o-OXeCCW/exec';
@@ -253,6 +258,12 @@
         const scannerModal = document.getElementById('scannerModal');
         const closeScannerBtn = document.getElementById('closeScannerBtn');
         let html5Qrcode;
+        
+        // Notification Modal Elements
+        const notificationModal = document.getElementById('notificationModal');
+        const notificationTitle = document.getElementById('notificationTitle');
+        const notificationMessage = document.getElementById('notificationMessage');
+        const notificationCloseBtn = document.getElementById('notificationCloseBtn');
 
 
         // App State
@@ -262,47 +273,64 @@
         let historyData = [];
         let sessionDefaultTimeInSeconds = null;
         let userSnapshots = {};
-        let globalLocks = {}; 
+        let globalState = {}; // Contains lockedIds and completedIds
 
         // Sound Synthesizers
         let successSynth, errorSynth;
 
         // Firebase State
         let db;
-        let unsubscribeListeners = []; 
+        let unsubscribeListeners = [];
+        let appId; // Globally accessible app ID
 
-        async function initializeFirebase(appId, firebaseConfig, loggedInUser, isAdmin) {
+        async function initializeFirebase(firebaseConfig, loggedInUser, isAdmin) {
             try {
-                if (!appId || !firebaseConfig) {
-                     throw new Error("CONFIGURATION_MISSING");
-                }
-                
                 const app = initializeApp(firebaseConfig);
                 db = getFirestore(app);
                 const auth = getAuth(app);
-                await signInAnonymously(auth);
-                
-                if (isAdmin) {
-                    setupAdminListeners(appId);
-                } else {
-                    const globalStateDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'countdownData', 'globalState');
-                    setupGlobalStateListener(globalStateDocRef);
-                    const appDataDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'countdownData', loggedInUser);
-                    setupSnapshotListener(appDataDocRef);
+
+                onAuthStateChanged(auth, async (user) => {
+                    if (user) {
+                        console.log("Authenticated with Firebase UID:", user.uid);
+                        // Fetch data from Google Sheets first
+                        await fetchData();
+
+                        // Now that we are authenticated and have sheet data, set up Firestore listeners
+                        if (isAdmin) {
+                            setupAdminListeners();
+                        } else {
+                            const globalStateDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'countdownData', 'globalState');
+                            setupGlobalStateListener(globalStateDocRef);
+                            const appDataDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'countdownData', loggedInUser);
+                            setupSnapshotListener(appDataDocRef);
+                        }
+                    }
+                    // The 'else' case (user is null) is handled by the initial sign-in attempt below.
+                });
+
+                // Trigger the authentication process if not already signed in
+                if (!auth.currentUser) {
+                    const token = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+                    if (token) {
+                        await signInWithCustomToken(auth, token);
+                    } else {
+                        await signInAnonymously(auth);
+                    }
                 }
-                
-                await fetchData();
 
             } catch(error) {
                 console.error("Firebase Initialization Error:", error);
                 let errorTitle = "เกิดข้อผิดพลาดในการเชื่อมต่อฐานข้อมูล";
                 let errorMessage = `<p class="text-sm text-gray-700 mb-4">ไม่สามารถเริ่มต้นการเชื่อมต่อกับฐานข้อมูลได้ กรุณาตรวจสอบว่า Firebase Config ถูกต้อง</p>`;
                 if (error.code) { 
-                     errorTitle = `เกิดข้อผิดพลาด: ${error.code}`;
-                     errorMessage = `<p class="text-sm text-gray-700 mb-4">${error.message}</p>`;
+                    errorTitle = `เกิดข้อผิดพลาด: ${error.code}`;
+                    errorMessage = `<p class="text-sm text-gray-700 mb-4">${error.message}</p>`;
                 }
                 
-                appContainer.innerHTML = `<div class="col-span-3 text-center bg-white p-8 rounded-xl shadow-lg"><h2 class="text-2xl font-bold text-red-600 mb-4">${errorTitle}</h2>${errorMessage}<button onclick="window.location.reload();" class="mt-4 bg-blue-500 text-white font-bold py-2 px-4 rounded-md hover:bg-blue-600 transition">รีเฟรช</button></div>`;
+                const container = sessionStorage.getItem('isAdmin') === 'true' ? adminContainer : appContainer;
+                container.innerHTML = `<div class="col-span-full text-center bg-white p-8 rounded-xl shadow-lg"><h2 class="text-2xl font-bold text-red-600 mb-4">${errorTitle}</h2>${errorMessage}<button onclick="window.location.reload();" class="mt-4 bg-blue-500 text-white font-bold py-2 px-4 rounded-md hover:bg-blue-600 transition">รีเฟรช</button></div>`;
+                container.classList.remove('hidden');
+                loginScreen.classList.add('hidden');
             }
         }
 
@@ -316,24 +344,25 @@
                 document.body.addEventListener('keydown', () => initializeAudio(), { once: true });
             }
 
+            // --- Re-added hardcoded Firebase config ---
             const firebaseConfig = {
-              apiKey: "AIzaSyC4KDnkJ_3Md1hHqr3pu5IxbDuSwUz7-vY",
-              authDomain: "coerf-a033d.firebaseapp.com",
-              projectId: "coerf-a033d",
-              storageBucket: "coerf-a033d.firebasestorage.app",
-              messagingSenderId: "1004453397450",
-              appId: "1:1004453397450:web:83825d12550e8ecf940533",
-              measurementId: "G-TBKV4XWWM7"
+                apiKey: "AIzaSyC4KDnkJ_3Md1hHqr3pu5IxbDuSwUz7-vY",
+                authDomain: "coerf-a033d.firebaseapp.com",
+                projectId: "coerf-a033d",
+                storageBucket: "coerf-a033d.firebasestorage.app",
+                messagingSenderId: "1004453397450",
+                appId: "1:1004453397450:web:83825d12550e8ecf940533",
+                measurementId: "G-TBKV4XWWM7"
             };
-            const appId = firebaseConfig.appId;
+            appId = firebaseConfig.appId; // Set the global appId
 
-            if (!appId || !firebaseConfig.apiKey) {
-                const container = isAdmin ? adminContainer : appContainer;
-                container.innerHTML = `<div class="col-span-3 text-center bg-white p-8 rounded-xl shadow-lg"><h2 class="text-2xl font-bold text-red-600 mb-4">ข้อผิดพลาดร้ายแรง</h2><p class="text-sm text-gray-700 mb-4">ไม่พบ Firebase Config ในโค้ดของแอปพลิเคชัน</p></div>`;
-                return;
+            if (!firebaseConfig.apiKey) {
+                 const container = isAdmin ? adminContainer : appContainer;
+                 container.innerHTML = `<div class="col-span-full text-center bg-white p-8 rounded-xl shadow-lg"><h2 class="text-2xl font-bold text-red-600 mb-4">ข้อผิดพลาดร้ายแรง</h2><p class="text-sm text-gray-700 mb-4">ไม่พบข้อมูลการกำหนดค่า Firebase</p></div>`;
+                 return;
             }
             
-            await initializeFirebase(appId, firebaseConfig, loggedInUser, isAdmin);
+            await initializeFirebase(firebaseConfig, loggedInUser, isAdmin);
         }
 
         async function fetchData() {
@@ -373,8 +402,7 @@
         
         function setupGlobalStateListener(docRef) {
             onSnapshot(docRef, (docSnap) => {
-                const data = docSnap.exists() ? docSnap.data() : {};
-                globalLocks = data.lockedIds || {};
+                globalState = docSnap.exists() ? docSnap.data() : { lockedIds: {}, completedIds: {} };
                 renderUserList(idInput.value.trim()); 
             });
         }
@@ -393,7 +421,7 @@
             unsubscribeListeners.push(unsubscribe);
         }
 
-        function setupAdminListeners(appId) {
+        function setupAdminListeners() {
             unsubscribeListeners.forEach(unsub => unsub());
             unsubscribeListeners = [];
 
@@ -449,11 +477,12 @@
                 row.className = 'bg-white border-b';
 
                 let statusHtml = `<span class="bg-gray-100 text-gray-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded">${entry.status}</span>`;
-                if (entry.status === 'ผลบวก (+)') {
+                if (entry.status === 'ผลบวก (+)' || entry.status === 'ผลลบ (-)') {
                     statusHtml = `<span class="bg-green-100 text-green-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded">${entry.status}</span>`;
-                } else if (entry.status === 'ผลลบ (-)') {
-                    statusHtml = `<span class="bg-blue-100 text-blue-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded">${entry.status}</span>`;
+                } else if (entry.status === 'รอผล') {
+                    statusHtml = `<span class="bg-red-100 text-red-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded">${entry.status}</span>`;
                 }
+
 
                 row.innerHTML = `
                     <td class="px-2 py-2 font-medium text-gray-900">${data.length - index}</td>
@@ -471,43 +500,36 @@
             });
             activeTimers = [];
             historyData = data.timerHistory || [];
-            allUsers.forEach(u => u.completed = false);
-
-            const savedCompletedIds = data.completedUserIds || [];
-            savedCompletedIds.forEach(id => {
-                const user = allUsers.find(u => u.id === id);
-                if (user) user.completed = true;
-            });
 
             const savedTimers = data.activeTimers || [];
             savedTimers.forEach(savedTimer => {
                 const user = allUsers.find(u => u.id === savedTimer.id);
                 if (user) {
                      const timeLeftMs = savedTimer.endTime - Date.now();
-                     const timerData = { user, startTime: Date.now() - (savedTimer.duration - timeLeftMs), duration: savedTimer.duration, owner: savedTimer.owner };
+                     const timerData = { user, startTime: Date.now() - (savedTimer.duration - timeLeftMs), duration: savedTimer.duration, owner: savedTimer.owner, finished: timeLeftMs <= 0, completionTime: savedTimer.completionTime };
                      activeTimers.push(timerData);
                 }
             });
         }
         
         function renderUI() {
-             const timerPlaceholderEl = document.getElementById('timerPlaceholder');
-             if (timerPlaceholderEl && activeTimers.length > 0) {
-                 timerPlaceholderEl.remove();
-             } else if (!timerPlaceholderEl && activeTimers.length === 0) {
-                 activeTimersContainer.innerHTML = '<div id="timerPlaceholder" class="text-center text-gray-400 flex items-center justify-center h-full"><p>ยิงบาร์โค้ดเพื่อเริ่มนับเวลา...</p></div>';
-             }
-             
-             activeTimers.forEach(timer => {
-                 if(!document.getElementById(`timer-${timer.user.id}`)) {
-                    createTimerCard(timer.user, timer.owner);
-                 }
-             });
+              const timerPlaceholderEl = document.getElementById('timerPlaceholder');
+              if (timerPlaceholderEl && activeTimers.length > 0) {
+                   timerPlaceholderEl.remove();
+              } else if (!timerPlaceholderEl && activeTimers.length === 0) {
+                   activeTimersContainer.innerHTML = '<div id="timerPlaceholder" class="text-center text-gray-400 flex items-center justify-center h-full"><p>ยิงบาร์โค้ดเพื่อเริ่มนับเวลา...</p></div>';
+              }
+              
+              activeTimers.forEach(timer => {
+                   if(!document.getElementById(`timer-${timer.user.id}`)) {
+                     createTimerCard(timer.user, timer.owner, timer.completionTime);
+                   }
+              });
 
-             if (activeTimers.length > 0) startGlobalAnimationLoop();
-             renderHistory();
-             renderUserList(idInput.value.trim());
-        }
+              if (activeTimers.length > 0) startGlobalAnimationLoop();
+              renderHistory();
+              renderUserList(idInput.value.trim());
+         }
         
         function initializeAudio() {
             if (Tone.context.state !== 'running') Tone.context.resume();
@@ -554,16 +576,17 @@
                 let classes = 'p-3 rounded-md cursor-pointer hover:bg-indigo-100 transition-colors duration-150';
                 
                 const loggedInUser = sessionStorage.getItem('loggedInUser');
-                const lockOwner = globalLocks[user.id];
+                const lockOwner = globalState.lockedIds ? globalState.lockedIds[user.id] : null;
+                const completedBy = globalState.completedIds ? globalState.completedIds[user.id] : null;
 
-                if (lockOwner && lockOwner !== loggedInUser) {
+                if (completedBy) {
+                    content = `<span class="font-bold">${user.fullName}</span><br><span class="text-sm">${user.id}</span><span class="float-right text-green-600 font-bold">✔ เสร็จสิ้นโดย ${completedBy}</span>`;
+                    classes = 'p-3 rounded-md text-gray-500 bg-green-100 cursor-not-allowed';
+                } else if (lockOwner && lockOwner !== loggedInUser) {
                     content = `<span class="font-bold">${user.fullName}</span><br><span class="text-sm">${user.id}</span><span class="float-right text-yellow-600 font-bold">ถูกนับโดย ${lockOwner}</span>`;
                     classes = 'p-3 rounded-md text-gray-500 bg-yellow-100 cursor-not-allowed';
                 } else if (activeTimers.some(t => t.user.id === user.id)) {
                     classes = 'p-3 rounded-md text-white bg-blue-500';
-                } else if (user.completed) {
-                    content = `<span class="font-bold">${user.fullName}</span><br><span class="text-sm">${user.id}</span><span class="float-right text-green-600 font-bold">✔ เสร็จสิ้น</span>`;
-                    classes = 'p-3 rounded-md text-gray-500 bg-green-100 line-through';
                 }
                 li.innerHTML = content;
                 li.className = classes;
@@ -573,14 +596,18 @@
         
         async function startProcess(id) {
             const loggedInUser = sessionStorage.getItem('loggedInUser');
-            const lockOwner = globalLocks[id];
+            const lockOwner = globalState.lockedIds ? globalState.lockedIds[id] : null;
+            const completedBy = globalState.completedIds ? globalState.completedIds[id] : null;
+
+            if (completedBy) {
+                updateStatusMessage(`'${allUsers.find(u=>u.id===id).fullName}' ตรวจเสร็จแล้วโดย ${completedBy}`, 'error');
+                if(errorSynth) errorSynth.triggerAttackRelease("C3", "8n");
+                return;
+            }
             
             if (lockOwner && lockOwner !== loggedInUser) {
-                const record = allUsers.find(user => user.id === id);
-                updateStatusMessage(`'${record.fullName}' ถูกนับโดย ${lockOwner} แล้ว`, 'error');
+                updateStatusMessage(`'${allUsers.find(u=>u.id===id).fullName}' ถูกนับโดย ${lockOwner} แล้ว`, 'error');
                 if(errorSynth) errorSynth.triggerAttackRelease("C3", "8n");
-                idInput.value = '';
-                renderUserList(idInput.value.trim());
                 return;
             }
 
@@ -589,21 +616,20 @@
                 updateStatusMessage(`"${id}" กำลังนับเวลาอยู่แล้ว`, 'info'); return;
             }
             if (record) {
-                if (record.completed) {
-                    updateStatusMessage(`"${record.fullName}" ได้นับเวลาไปแล้ว`, 'info'); return;
-                }
                 if(successSynth) successSynth.triggerAttackRelease("C5", "8n");
                 
-                const appId = "1:1004453397450:web:83825d12550e8ecf940533";
                 const globalStateDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'countdownData', 'globalState');
                 await setDoc(globalStateDocRef, { lockedIds: { [id]: loggedInUser } }, { merge: true });
 
                 const timerPlaceholderEl = document.getElementById('timerPlaceholder');
                 if (timerPlaceholderEl) timerPlaceholderEl.remove();
                 const durationInSeconds = sessionDefaultTimeInSeconds !== null ? sessionDefaultTimeInSeconds : parseInt(record.timeInSeconds, 10);
-                const timerData = { user: record, startTime: Date.now(), duration: durationInSeconds * 1000 };
+                
+                const completionTime = new Date().toISOString();
+                const timerData = { user: record, startTime: Date.now(), duration: durationInSeconds * 1000, finished: false, completionTime: completionTime };
+                
                 activeTimers.push(timerData);
-                createTimerCard(record);
+                createTimerCard(record, null, completionTime);
                 renderUserList(idInput.value.trim());
                 startGlobalAnimationLoop();
                 updateStatusMessage(`เริ่มนับเวลาสำหรับ: ${record.fullName}`, 'success');
@@ -618,7 +644,7 @@
             renderUserList(idInput.value.trim());
         }
         
-        function createTimerCard(user, owner) {
+        function createTimerCard(user, owner, completionTime) {
             const card = document.createElement('div');
             card.id = `timer-${user.id}`;
             const ownerHtml = owner ? `<p class="text-xs opacity-70 mt-1">โดย: ${owner}</p>` : '';
@@ -629,39 +655,25 @@
                     <p class="text-sm opacity-80">${user.id}</p>
                     ${ownerHtml}
                 </div>
-                <div class="font-mono text-4xl font-bold tracking-tighter mr-4" data-timer-display="true">00:00:00.000</div>
-                ${!owner ? `<div class="delete-btn-container w-24 text-center"><button onclick="deleteTimer('${user.id}')" class="delete-btn p-2 rounded-full hover:bg-red-700"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24" 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg></button></div>` : ''}
+                <div class="flex items-center gap-4">
+                    <div class="font-mono text-4xl font-bold tracking-tighter" data-timer-display="true">00:00:00.000</div>
+                    ${!owner ? `<div class="result-btn-container w-24 text-center">
+                                     <div class="flex flex-col space-y-2">
+                                         <button onclick="recordResult('${user.id}', '${completionTime}', 'ผลบวก (+)')" class="bg-green-500 text-white px-3 py-1 rounded text-sm hover:bg-green-600">ผลบวก (+)</button>
+                                         <button onclick="recordResult('${user.id}', '${completionTime}', 'ผลลบ (-)')" class="bg-blue-500 text-white px-3 py-1 rounded text-sm hover:bg-blue-600">ผลลบ (-)</button>
+                                     </div>
+                                 </div>` : ''}
+                     ${!owner ? `<button onclick="cancelTimer('${user.id}')" class="text-white/70 hover:text-white p-2 rounded-full transition-colors self-center">
+                                     <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm4 0a1 1 0 012 0v6a1 1 0 11-2 0V8z" clip-rule="evenodd"></path></svg>
+                                  </button>` : ''}
+                </div>
             `;
             activeTimersContainer.prepend(card);
         }
         
-        async function removeGlobalLock(idToRemove) {
-            const appId = "1:1004453397450:web:83825d12550e8ecf940533";
+        async function updateGlobalState(updates) {
             const globalStateDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'countdownData', 'globalState');
-            await updateDoc(globalStateDocRef, { [`lockedIds.${idToRemove}`]: deleteField() });
-        }
-
-        window.deleteTimer = async function(id) {
-            await removeGlobalLock(id);
-            
-            const card = document.getElementById(`timer-${id}`);
-            if (card) card.remove();
-            
-            activeTimers = activeTimers.filter(timer => timer.user.id !== id);
-            
-            const userInArray = allUsers.find(u => u.id === id);
-            if (userInArray) userInArray.completed = false; // Allow re-timing after deletion
-
-            renderUserList(idInput.value.trim());
-
-            if (activeTimers.length === 0) {
-                 if (!document.getElementById('timerPlaceholder')) {
-                    activeTimersContainer.innerHTML = '<div id="timerPlaceholder" class="text-center text-gray-400 flex items-center justify-center h-full"><p>ยิงบาร์โค้ดเพื่อเริ่มนับเวลา...</p></div>';
-                 }
-                 cancelAnimationFrame(globalAnimationFrameId);
-                 globalAnimationFrameId = null;
-            }
-            saveState();
+            await updateDoc(globalStateDocRef, updates);
         }
 
         function globalAnimationLoop() {
@@ -677,29 +689,16 @@
                     updateTimerDisplay(display, timeLeftMs);
                 } else {
                     updateTimerDisplay(display, 0);
-                    card.classList.remove('bg-indigo-500');
-                    card.classList.add('bg-red-600');
-                    
-                    const userInArray = allUsers.find(u => u.id === timer.user.id);
-                    if (userInArray && !userInArray.completed) {
-                        userInArray.completed = true;
-                        const completionTime = new Date().toISOString();
-                        addToHistory(timer.user, 'รอผล', timer.duration, completionTime);
-                        
-                        const buttonContainer = card.querySelector('.delete-btn-container');
-                        if (buttonContainer) {
-                            buttonContainer.innerHTML = `
-                                <div class="flex flex-col space-y-2">
-                                    <button onclick="recordResult('${timer.user.id}', '${completionTime}', 'ผลบวก (+)')" class="bg-green-500 text-white px-3 py-1 rounded text-sm hover:bg-green-600">ผลบวก (+)</button>
-                                    <button onclick="recordResult('${timer.user.id}', '${completionTime}', 'ผลลบ (-)')" class="bg-blue-500 text-white px-3 py-1 rounded text-sm hover:bg-blue-600">ผลลบ (-)</button>
-                                </div>
-                            `;
-                        }
+                    if (!timer.finished) {
+                        timer.finished = true;
+                        card.classList.remove('bg-indigo-500');
+                        card.classList.add('bg-red-600');
+                        addToHistory(timer.user, "รอผล", timer.duration, timer.completionTime, true);
                     }
                 }
             });
-
-            if (activeTimers.some(t => t.startTime + t.duration - Date.now() > 0)) {
+            
+            if (activeTimers.length > 0) {
                  globalAnimationFrameId = requestAnimationFrame(globalAnimationLoop);
             } else {
                  cancelAnimationFrame(globalAnimationFrameId);
@@ -707,23 +706,69 @@
             }
         }
         
-        window.recordResult = async function(userId, completionTime, result) {
-            const historyIndex = historyData.findIndex(item => item.completionTime === completionTime);
-            if (historyIndex > -1) {
-                historyData[historyIndex].status = result;
-                await saveState();
-            }
+        window.cancelTimer = async function(userId) {
+            const timerIndex = activeTimers.findIndex(t => t.user.id === userId);
+            if (timerIndex === -1) return;
 
-            await removeGlobalLock(userId);
+            // Remove from active timers
+            activeTimers.splice(timerIndex, 1);
+
+            // Remove from UI
             const card = document.getElementById(`timer-${userId}`);
             if (card) card.remove();
-            activeTimers = activeTimers.filter(timer => timer.user.id !== userId);
+            
+            // Unlock the ID in global state
+            await updateGlobalState({
+                [`lockedIds.${userId}`]: deleteField()
+            });
 
+            // Save the current user's state (with the timer removed)
+            await saveState();
+
+            // Check if we need to show the placeholder
             if (activeTimers.length === 0) {
                 if (!document.getElementById('timerPlaceholder')) {
                    activeTimersContainer.innerHTML = '<div id="timerPlaceholder" class="text-center text-gray-400 flex items-center justify-center h-full"><p>ยิงบาร์โค้ดเพื่อเริ่มนับเวลา...</p></div>';
                 }
             }
+        }
+
+        window.recordResult = async function(userId, completionTime, result) {
+            const timer = activeTimers.find(t => t.completionTime === completionTime);
+            if (!timer) return;
+
+            addToHistory(timer.user, result, timer.duration, completionTime, true);
+
+            const card = document.getElementById(`timer-${userId}`);
+            if (card) {
+                // Add a smooth transition effect before removing
+                card.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+                card.style.opacity = '0';
+                card.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    card.remove();
+                }, 300); // Remove the element after the transition completes
+            }
+
+            // Filter out the timer from the active list
+            activeTimers = activeTimers.filter(t => t.completionTime !== completionTime);
+
+            const loggedInUser = sessionStorage.getItem('loggedInUser');
+            await updateGlobalState({
+                [`lockedIds.${userId}`]: deleteField(),
+                [`completedIds.${userId}`]: loggedInUser
+            });
+
+            await saveState();
+
+            // Use a timeout to check for placeholder after the card has been removed
+            setTimeout(() => {
+                if (activeTimers.length === 0) {
+                    if (!document.getElementById('timerPlaceholder')) {
+                        activeTimersContainer.innerHTML = '<div id="timerPlaceholder" class="text-center text-gray-400 flex items-center justify-center h-full"><p>ยิงบาร์โค้ดเพื่อเริ่มนับเวลา...</p></div>';
+                    }
+                }
+            }, 310);
         }
 
         function startGlobalAnimationLoop() {
@@ -761,10 +806,10 @@
                 }
                 
                 let statusHtml = `<span class="bg-gray-100 text-gray-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded">${entry.status}</span>`;
-                if (entry.status === 'ผลบวก (+)') {
+                if (entry.status === 'ผลบวก (+)' || entry.status === 'ผลลบ (-)') {
                     statusHtml = `<span class="bg-green-100 text-green-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded">${entry.status}</span>`;
-                } else if (entry.status === 'ผลลบ (-)') {
-                    statusHtml = `<span class="bg-blue-100 text-blue-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded">${entry.status}</span>`;
+                } else if (entry.status === 'รอผล') {
+                    statusHtml = `<span class="bg-red-100 text-red-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded">${entry.status}</span>`;
                 }
 
 
@@ -773,14 +818,23 @@
             });
         }
         
-        window.deleteHistoryItem = function(completionTime) {
+        window.deleteHistoryItem = async function(completionTime) {
+            const itemToDelete = historyData.find(item => item.completionTime === completionTime);
+            if (itemToDelete) {
+                await updateGlobalState({ [`completedIds.${itemToDelete.user.id}`]: deleteField() });
+            }
             historyData = historyData.filter(item => item.completionTime !== completionTime);
             saveState();
         }
 
-        function addToHistory(user, status, durationMs, completionTime) {
-            const historyEntry = { user, status, durationMs, completionTime };
-            historyData.unshift(historyEntry);
+        function addToHistory(user, status, durationMs, completionTime, isUpdate = false) {
+            const existingIndex = historyData.findIndex(item => item.completionTime === completionTime);
+            if (isUpdate && existingIndex > -1) { 
+                historyData[existingIndex].status = status;
+            } else if (existingIndex === -1) { 
+                const historyEntry = { user, status, durationMs, completionTime };
+                historyData.unshift(historyEntry);
+            }
             renderHistory();
             if (sessionStorage.getItem('isAdmin') !== 'true') {
                 saveState();
@@ -805,37 +859,18 @@
                 }
             }, 3000);
         }
-
-        function parseCSV(text) {
-            if (text.charCodeAt(0) === 0xFEFF) text = text.slice(1);
-            const rows = text.trim().split(/\r?\n/).slice(1);
-            return rows.map(row => {
-                const columns = row.split(',');
-                if (columns.length < 3) return null;
-                const id = columns[0] ? columns[0].trim().replace(/"/g, '').replace(/\r/g, '') : '';
-                const fullName = columns[1] ? columns[1].trim().replace(/"/g, '').replace(/\r/g, '') : '';
-                const timeInSeconds = columns[2] ? columns[2].trim().replace(/"/g, '').replace(/\r/g, '') : '0';
-                if (/^\d{13}$/.test(id)) {
-                    return { id, fullName, timeInSeconds, completed: false };
-                }
-                return null;
-            }).filter(user => user !== null && user.id && user.fullName);
-        }
-
+        
         async function saveState() {
             const loggedInUser = sessionStorage.getItem('loggedInUser');
             if (!db || !loggedInUser || loggedInUser === 'admin') return;
 
-            const appId = "1:1004453397450:web:83825d12550e8ecf940533";
             const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'countdownData', loggedInUser);
             
-            const timersToSave = activeTimers.map(t => ({ id: t.user.id, endTime: t.startTime + t.duration, duration: t.duration }));
-            const completedUserIds = allUsers.filter(u => u.completed).map(u => u.id);
-
+            const timersToSave = activeTimers.map(t => ({ id: t.user.id, endTime: t.startTime + t.duration, duration: t.duration, completionTime: t.completionTime }));
+            
             const dataToSave = {
                 activeTimers: timersToSave,
                 timerHistory: historyData,
-                completedUserIds: completedUserIds
             };
 
             try {
@@ -867,6 +902,12 @@
                 }, 500);
             }
         }
+        
+        function showNotification(title, message) {
+            notificationTitle.textContent = title;
+            notificationMessage.textContent = message;
+            notificationModal.classList.remove('hidden');
+        }
 
         // --- Event Listeners ---
         loginBtn.addEventListener('click', handleLogin);
@@ -893,7 +934,12 @@
         
         userList.addEventListener('click', (event) => {
             const li = event.target.closest('li');
-            if (li) startProcess(li.dataset.id);
+            if (li) {
+                const isClickable = !li.classList.contains('cursor-not-allowed');
+                if (isClickable) {
+                    startProcess(li.dataset.id);
+                }
+            }
         });
 
         setDefaultTimeBtn.addEventListener('click', () => {
@@ -930,17 +976,21 @@
             confirmBtn.addEventListener('click', async () => {
                 if (passwordInput.value === '3215') {
                     const loggedInUser = sessionStorage.getItem('loggedInUser');
-                    const appId = "1:1004453397450:web:83825d12550e8ecf940533";
 
                     const locksToRemove = {};
                     activeTimers.forEach(timer => {
                         locksToRemove[`lockedIds.${timer.user.id}`] = deleteField();
                     });
+                    
+                    const completedToRemove = {};
+                    historyData.forEach(entry => {
+                         completedToRemove[`completedIds.${entry.user.id}`] = deleteField();
+                    });
 
-                    if (Object.keys(locksToRemove).length > 0) {
+                    if (Object.keys(locksToRemove).length > 0 || Object.keys(completedToRemove).length > 0) {
                         const globalStateDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'countdownData', 'globalState');
                         try {
-                            await updateDoc(globalStateDocRef, locksToRemove);
+                            await updateDoc(globalStateDocRef, {...locksToRemove, ...completedToRemove});
                         } catch (err) {
                             console.error("Error clearing global locks:", err);
                         }
@@ -978,12 +1028,12 @@
             html5Qrcode.start({ facingMode: "environment" }, config, 
                 (decodedText, decodedResult) => { // onScanSuccess
                     html5Qrcode.stop().then(() => {
-                      scannerModal.classList.add('hidden');
-                      if (/^\d{13}$/.test(decodedText)) {
-                          startProcess(decodedText);
-                      } else {
-                          updateStatusMessage('บาร์โค้ดไม่ถูกต้อง (ต้องเป็นเลข 13 หลัก)', 'error');
-                      }
+                        scannerModal.classList.add('hidden');
+                        if (/^\d{13}$/.test(decodedText)) {
+                            startProcess(decodedText);
+                        } else {
+                            updateStatusMessage('บาร์โค้ดไม่ถูกต้อง (ต้องเป็นเลข 13 หลัก)', 'error');
+                        }
                     });
                 }, 
                 (errorMessage) => { // onScanFailure
@@ -991,7 +1041,7 @@
                 })
                 .catch(err => {
                     console.error("Unable to start scanning.", err);
-                    alert(`ไม่สามารถเปิดกล้องได้: ${err}`);
+                    showNotification('เกิดข้อผิดพลาด', `ไม่สามารถเปิดกล้องได้: ${err}`);
                     scannerModal.classList.add('hidden');
                 });
         });
@@ -1004,8 +1054,60 @@
             scannerModal.classList.add('hidden');
         });
 
+        downloadExcelBtn.addEventListener('click', () => {
+            let combinedHistory = [];
+            for (const username in userSnapshots) {
+                const data = userSnapshots[username];
+                if (data.timerHistory) {
+                    combinedHistory.push(...data.timerHistory.map(item => ({...item, owner: username})));
+                }
+            }
+
+            if (combinedHistory.length === 0) {
+                showNotification("ไม่มีข้อมูล", "ไม่มีข้อมูลประวัติให้ดาวน์โหลด");
+                return;
+            }
+            
+            combinedHistory.sort((a, b) => new Date(b.completionTime) - new Date(a.completionTime));
+
+            const headers = ["ผู้ใช้งาน", "ID", "ชื่อ-สกุล", "เวลาที่ตั้งค่า (HH:MM:SS)", "เวลาที่ครบกำหนด", "ผลการตรวจ"];
+            let csvContent = "\uFEFF" + headers.join(",") + "\n";
+
+            combinedHistory.forEach(entry => {
+                const user = entry.user;
+                const owner = entry.owner || 'N/A';
+                const id = `'${user.id}`; // Add apostrophe to treat as text in excel
+                const fullName = user.fullName.replace(/,/g, ''); 
+                const durationSeconds = Math.floor(entry.durationMs / 1000);
+                const setTime = new Date(durationSeconds * 1000).toISOString().substr(11, 8);
+                const completionTime = entry.completionTime ? new Date(entry.completionTime).toLocaleTimeString('th-TH') : '-';
+                const status = entry.status || 'N/A';
+
+                const row = [owner, id, fullName, setTime, completionTime, status].join(",");
+                csvContent += row + "\n";
+            });
+
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            if (link.download !== undefined) {
+                const url = URL.createObjectURL(blob);
+                const date = new Date().toISOString().slice(0, 10);
+                link.setAttribute("href", url);
+                link.setAttribute("download", `ประวัติการนับเวลา_${date}.csv`);
+                link.style.visibility = 'hidden';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
+        });
+        
+        notificationCloseBtn.addEventListener('click', () => {
+            notificationModal.classList.add('hidden');
+        });
+
 
     </script>
 </body>
 </html>
+
 
