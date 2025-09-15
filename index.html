@@ -113,17 +113,19 @@
                      </button>
                  </div>
                 
-                 <div class="flex items-center gap-2 mb-4">
-                     <input type="text" id="idInput" class="block w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-base transition" placeholder="ยิงบาร์โค้ด หรือ ค้นหา...">
-                     <button id="scanBtn" class="p-2.5 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition">
-                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4 2a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2V4a2 2 0 00-2-2H4zm10.5 4a.5.5 0 00-.5-.5h-3a.5.5 0 000 1h3a.5.5 0 00.5-.5zM4 8a.5.5 0 01.5-.5h11a.5.5 0 010 1h-11A.5.5 0 014 8zm0 2a.5.5 0 01.5-.5h5a.5.5 0 010 1h-5A.5.5 0 014 10zm11.5 2.5a.5.5 0 00-.5-.5h-3a.5.5 0 000 1h3a.5.5 0 00.5-.5zM4 14a.5.5 0 01.5-.5h11a.5.5 0 010 1h-11a.5.5 0 01-.5-.5z" clip-rule="evenodd" /></svg>
-                     </button>
+                 <div class="relative">
+                     <div class="flex items-center gap-2 mb-4">
+                         <input type="text" id="idInput" class="block w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-base transition" placeholder="ยิงบาร์โค้ด หรือ ค้นหา..." autocomplete="off">
+                         <button id="scanBtn" class="p-2.5 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition">
+                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4 2a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2V4a2 2 0 00-2-2H4zm10.5 4a.5.5 0 00-.5-.5h-3a.5.5 0 000 1h3a.5.5 0 00.5-.5zM4 8a.5.5 0 01.5-.5h11a.5.5 0 010 1h-11A.5.5 0 014 8zm0 2a.5.5 0 01.5-.5h5a.5.5 0 010 1h-5A.5.5 0 014 10zm11.5 2.5a.5.5 0 00-.5-.5h-3a.5.5 0 000 1h3a.5.5 0 00.5-.5zM4 14a.5.5 0 01.5-.5h11a.5.5 0 010 1h-11a.5.5 0 01-.5-.5z" clip-rule="evenodd" /></svg>
+                         </button>
+                     </div>
+                     <div id="userListContainer" class="absolute z-20 w-full -mt-4 bg-white border border-gray-300 rounded-lg shadow-lg hidden max-h-80 overflow-y-auto">
+                          <div id="listStatus" class="p-4 text-center"></div>
+                          <ul id="userList" class="space-y-1 p-1"></ul>
+                     </div>
                  </div>
 
-                 <div id="userListContainer" class="flex-grow overflow-y-auto bg-gray-50 p-2 border rounded-lg min-h-[20rem]">
-                      <div id="listStatus" class="p-4 text-center"></div>
-                      <ul id="userList" class="space-y-1"></ul>
-                 </div>
                  <button id="resetAllBtn" class="w-full mt-4 bg-red-600 text-white font-bold py-2 px-4 rounded-md hover:bg-red-700 transition">
                      รีเซ็ตข้อมูลทั้งหมด
                  </button>
@@ -239,6 +241,7 @@
         const idInput = document.getElementById('idInput');
         const statusText = document.getElementById('statusText');
         const userList = document.getElementById('userList');
+        const userListContainer = document.getElementById('userListContainer');
         const listStatus = document.getElementById('listStatus');
         const activeTimersContainer = document.getElementById('activeTimersContainer');
         const setDefaultTimeBtn = document.getElementById('setDefaultTimeBtn');
@@ -559,20 +562,25 @@
         
         function renderUserList(filter = '') {
             userList.innerHTML = '';
+
+            if (!filter) {
+                userListContainer.classList.add('hidden');
+                return;
+            }
+
             const lowerCaseFilter = filter.toLowerCase();
             const filteredUsers = allUsers.filter(user => user.fullName.toLowerCase().includes(lowerCaseFilter) || user.id.includes(filter));
             
-            const usersToDisplay = filter ? filteredUsers : allUsers;
-
-            if (usersToDisplay.length === 0 && filter) {
-                 userList.innerHTML = `<div class="p-4 text-gray-500">ไม่พบรายชื่อที่ตรงกัน</div>`;
+            if (filteredUsers.length === 0) {
+                 userList.innerHTML = `<li class="p-3 text-gray-500 text-center cursor-default">ไม่พบรายชื่อที่ตรงกัน</li>`;
+                 userListContainer.classList.remove('hidden');
                  return;
             }
 
-            usersToDisplay.forEach(user => {
+            filteredUsers.forEach(user => {
                 const li = document.createElement('li');
                 li.dataset.id = user.id;
-                let content = `<span class="font-bold">${user.fullName}</span><br><span class="text-sm text-gray-500">${user.id}</span>`;
+                let content = `<span class="font-bold block">${user.fullName}</span><span class="text-sm text-gray-500">${user.id}</span>`;
                 let classes = 'p-3 rounded-md cursor-pointer hover:bg-indigo-100 transition-colors duration-150';
                 
                 const loggedInUser = sessionStorage.getItem('loggedInUser');
@@ -580,11 +588,11 @@
                 const completedBy = globalState.completedIds ? globalState.completedIds[user.id] : null;
 
                 if (completedBy) {
-                    content = `<span class="font-bold">${user.fullName}</span><br><span class="text-sm">${user.id}</span><span class="float-right text-green-600 font-bold">✔ เสร็จสิ้นโดย ${completedBy}</span>`;
-                    classes = 'p-3 rounded-md text-gray-500 bg-green-100 cursor-not-allowed';
+                    content = `<span class="font-bold block">${user.fullName}</span><span class="text-sm">${user.id}</span><span class="absolute right-3 top-1/2 -translate-y-1/2 text-green-600 font-bold">✔ เสร็จสิ้น</span>`;
+                    classes = 'relative p-3 rounded-md text-gray-400 bg-green-50 cursor-not-allowed';
                 } else if (lockOwner && lockOwner !== loggedInUser) {
-                    content = `<span class="font-bold">${user.fullName}</span><br><span class="text-sm">${user.id}</span><span class="float-right text-yellow-600 font-bold">ถูกนับโดย ${lockOwner}</span>`;
-                    classes = 'p-3 rounded-md text-gray-500 bg-yellow-100 cursor-not-allowed';
+                    content = `<span class="font-bold block">${user.fullName}</span><span class="text-sm">${user.id}</span><span class="absolute right-3 top-1/2 -translate-y-1/2 text-yellow-600 font-bold">กำลังนับ</span>`;
+                    classes = 'relative p-3 rounded-md text-gray-400 bg-yellow-50 cursor-not-allowed';
                 } else if (activeTimers.some(t => t.user.id === user.id)) {
                     classes = 'p-3 rounded-md text-white bg-blue-500';
                 }
@@ -592,6 +600,7 @@
                 li.className = classes;
                 userList.appendChild(li);
             });
+            userListContainer.classList.remove('hidden');
         }
         
         async function startProcess(id) {
@@ -641,7 +650,8 @@
                 setTimeout(() => idInput.classList.remove('input-error'), 1000);
             }
             idInput.value = '';
-            renderUserList(idInput.value.trim());
+            userListContainer.classList.add('hidden');
+            renderUserList('');
         }
         
         function createTimerCard(user, owner, completionTime) {
@@ -924,6 +934,12 @@
             window.location.reload();
         });
 
+        idInput.addEventListener('focus', () => {
+            if (idInput.value.trim()) {
+                renderUserList(idInput.value.trim());
+            }
+        });
+
         idInput.addEventListener('input', () => {
             const value = idInput.value.trim();
             renderUserList(value);
@@ -939,6 +955,13 @@
                 if (isClickable) {
                     startProcess(li.dataset.id);
                 }
+            }
+        });
+
+        document.addEventListener('click', (event) => {
+            const searchContainer = idInput.closest('.relative');
+            if (searchContainer && !searchContainer.contains(event.target)) {
+                userListContainer.classList.add('hidden');
             }
         });
 
@@ -1109,5 +1132,4 @@
     </script>
 </body>
 </html>
-
 
