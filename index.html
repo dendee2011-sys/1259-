@@ -192,7 +192,15 @@
     <div id="scannerModal" class="fixed inset-0 bg-black bg-opacity-75 flex flex-col items-center justify-center p-4 z-50 hidden">
         <div class="bg-white p-4 rounded-lg shadow-xl w-full max-w-md">
             <p class="text-center text-gray-600 mb-2">วางบาร์โค้ดในกรอบสี่เหลี่ยม</p>
-            <div id="reader" class="w-full"></div>
+            <div class="relative w-full aspect-square bg-gray-200 rounded-lg overflow-hidden">
+                <div id="reader-loading" class="absolute inset-0 flex items-center justify-center">
+                    <svg class="animate-spin h-10 w-10 text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                </div>
+                <div id="reader" class="w-full"></div>
+            </div>
             <button id="closeScannerBtn" class="w-full mt-4 bg-red-600 text-white font-bold py-2 px-4 rounded-md hover:bg-red-700">
                 ปิดกล้อง
             </button>
@@ -1040,82 +1048,58 @@
         });
         
         scanBtn.addEventListener('click', () => {
+            const readerLoading = document.getElementById('reader-loading');
+            
             scannerModal.classList.remove('hidden');
-            document.getElementById('reader').innerHTML = ''; // Clear the container
+            readerLoading.classList.remove('hidden');
 
-            // Always create a new instance for robustness, especially on mobile.
-            // Set verbose to false to avoid flooding the console.
+            if (html5Qrcode && html5Qrcode.isScanning) {
+                return;
+            }
+
+            document.getElementById('reader').innerHTML = '';
             html5Qrcode = new Html5Qrcode("reader", { verbose: false });
 
-            const config = { fps: 10, qrbox: { width: 250, height: 250 } };
+            const config = { 
+                fps: 10, 
+                qrbox: { width: 250, height: 250 },
+                rememberLastUsedCamera: true
+            };
 
             const onScanSuccess = (decodedText, decodedResult) => {
-                // We are looking for any sequence of numbers.
                 if (/^\d+$/.test(decodedText)) {
-                    if (html5Qrcode && html5Qrcode.isScanning) {
-                        // Stop the scanner and process the result.
-                        html5Qrcode.stop().then(() => {
-                            scannerModal.classList.add('hidden');
-                            startProcess(decodedText);
-                        }).catch(err => {
-                            console.error("Failed to stop scanner after success", err);
-                            scannerModal.classList.add('hidden');
-                        });
-                    }
+                    closeScannerBtn.click(); 
+                    startProcess(decodedText);
                 }
-                // If the scanned code is not purely numeric, we ignore it and let the scanner continue.
-            };
-            
-            const onScanFailure = (error) => {
-                // This callback is called frequently, so we don't do anything here.
             };
 
-            // First, check for camera permissions and availability.
-            Html5Qrcode.getCameras().then(cameras => {
-                if (cameras && cameras.length) {
-                    // Start scanning, preferring the back camera.
-                    html5Qrcode.start(
-                        { facingMode: "environment" },
-                        config,
-                        onScanSuccess,
-                        onScanFailure
-                    ).catch(err => {
-                        console.error("Error starting scanner:", err);
-                        showNotification('เกิดข้อผิดพลาด', 'ไม่สามารถเริ่มการสแกนได้ อาจมีบางอย่างขัดข้อง');
-                        scannerModal.classList.add('hidden');
-                    });
-                } else {
-                     showNotification('เกิดข้อผิดพลาด', 'ไม่พบกล้องในอุปกรณ์ของคุณ');
-                     scannerModal.classList.add('hidden');
-                }
-            }).catch(err => {
-                console.error("Error getting camera permissions:", err);
-                let errorMessage = `ไม่สามารถเข้าถึงกล้องได้: ${err.name || err}`;
-                if (err.name === "NotAllowedError") {
-                    errorMessage = "คุณต้องอนุญาตให้เบราว์เซอร์ใช้กล้อง กรุณาตรวจสอบการตั้งค่าของเว็บไซต์นี้ในเบราว์เซอร์ของคุณ";
-                }
-                showNotification('เกิดข้อผิดพลาด', errorMessage);
+            html5Qrcode.start(
+                { facingMode: "environment" },
+                config,
+                onScanSuccess,
+                (errorMessage) => { /* ignore */ }
+            )
+            .then(() => {
+                readerLoading.classList.add('hidden');
+            })
+            .catch((err) => {
+                console.error(`Unable to start scanning, error: ${err}`);
+                showNotification('เกิดข้อผิดพลาด', `ไม่สามารถเริ่มการสแกนได้: กรุณาตรวจสอบว่าคุณได้อนุญาตให้เบราว์เซอร์เข้าถึงกล้องแล้ว`);
                 scannerModal.classList.add('hidden');
             });
         });
 
-        closeScannerBtn.addEventListener('click', () => {
+        closeScannerBtn.addEventListener('click', async () => {
+            scannerModal.classList.add('hidden');
             if (html5Qrcode && html5Qrcode.isScanning) {
-                html5Qrcode.stop()
-                    .then(() => {
-                        // Success
-                    })
-                    .catch(err => {
-                        console.error("Failed to stop scanner on close button click.", err);
-                    })
-                    .finally(() => {
-                        // Always hide the modal and clear the reader
-                        scannerModal.classList.add('hidden');
-                        document.getElementById('reader').innerHTML = '';
-                    });
-            } else {
-                scannerModal.classList.add('hidden');
+                try {
+                    await html5Qrcode.stop();
+                    await html5Qrcode.clear();
+                } catch (err) {
+                    console.error("Error stopping or clearing scanner.", err);
+                }
             }
+            html5Qrcode = null;
         });
 
         downloadExcelBtn.addEventListener('click', () => {
@@ -1173,5 +1157,4 @@
     </script>
 </body>
 </html>
-
 
