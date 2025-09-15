@@ -353,6 +353,7 @@
         let sessionDefaultTimeInSeconds = null;
         let userSnapshots = {};
         let globalState = {}; // Contains lockedIds and completedIds
+        let isInitialLoadComplete = false; // Flag to prevent premature state saving
 
         // Sound Synthesizers
         let successSynth, errorSynth;
@@ -496,6 +497,8 @@
                 const data = docSnap.exists() ? docSnap.data() : {};
                 updateLocalState(data);
                 renderUI();
+                // After the first data load, allow the app to save state.
+                isInitialLoadComplete = true; 
             }, (error) => {
                 console.error("Firestore snapshot error:", error);
                 statusText.textContent = "การเชื่อมต่อข้อมูลขัดข้อง";
@@ -950,6 +953,11 @@
         }
         
         async function saveState() {
+            // Guard against saving state before the initial data has been loaded from Firestore.
+            if (!isInitialLoadComplete) {
+                console.warn("Attempted to save state before initial load was complete. Operation skipped.");
+                return;
+            }
             const loggedInUser = sessionStorage.getItem('loggedInUser');
             if (!db || !loggedInUser || loggedInUser === 'admin') return;
 
@@ -1141,28 +1149,34 @@
                 if (passwordInput.value === '3215') {
                     const loggedInUser = sessionStorage.getItem('loggedInUser');
 
-                    const locksToRemove = {};
+                    const globalUpdates = {};
+                    
                     activeTimers.forEach(timer => {
-                        locksToRemove[`lockedIds.${timer.user.id}`] = deleteField();
+                        globalUpdates[`lockedIds.${timer.user.id}`] = deleteField();
                     });
                     
-                    const completedToRemove = {};
-                    historyData.forEach(entry => {
-                         completedToRemove[`completedIds.${entry.user.id}`] = deleteField();
-                    });
+                    if (globalState.completedIds) {
+                        historyData.forEach(entry => {
+                            if (globalState.completedIds[entry.user.id] === loggedInUser) {
+                                globalUpdates[`completedIds.${entry.user.id}`] = deleteField();
+                            }
+                        });
+                    }
 
-                    if (Object.keys(locksToRemove).length > 0 || Object.keys(completedToRemove).length > 0) {
+                    if (Object.keys(globalUpdates).length > 0) {
                         const globalStateDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'countdownData', 'globalState');
                         try {
-                            await updateDoc(globalStateDocRef, {...locksToRemove, ...completedToRemove});
+                            await updateDoc(globalStateDocRef, globalUpdates);
                         } catch (err) {
-                            console.error("Error clearing global locks:", err);
+                            console.error("Error clearing global states:", err);
                         }
                     }
 
                     const userDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'countdownData', loggedInUser);
-                    if (userDocRef) {
-                       await setDoc(userDocRef, {});
+                    try {
+                        await setDoc(userDocRef, {});
+                    } catch (err) {
+                        console.error("Error clearing user document:", err)
                     }
                     
                     removeConfirmation();
