@@ -7,7 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.js"></script>
     <script src="https://unpkg.com/html5-qrcode@2.3.8/dist/html5-qrcode.min.js" type="text/javascript"></script>
-    <!-- Tesseract.js for OCR - Added -->
+    <!-- Tesseract.js for OCR -->
     <script src='https://unpkg.com/tesseract.js@5.0.0/dist/tesseract.min.js'></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -62,7 +62,7 @@
             height: auto !important;
             border-radius: 0.5rem;
         }
-        /* OCR Styles - Added */
+        /* OCR Styles */
         #ocr-video-container {
             position: relative;
             width: 100%;
@@ -143,9 +143,8 @@
                  <div class="relative">
                      <div class="flex items-center gap-2 mb-4">
                          <input type="text" id="idInput" class="block w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-base transition" placeholder="ยิงบาร์โค้ด หรือ ค้นหา..." autocomplete="off">
-                         <!-- Modified: Added OCR Scan Button -->
                          <button id="ocrScanBtn" title="สแกนตัวเลขด้วยกล้อง" class="p-2.5 bg-green-600 text-white rounded-md hover:bg-green-700 transition">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
                          </button>
                          <button id="scanBtn" title="สแกนบาร์โค้ด" class="p-2.5 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition">
                              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4 2a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2V4a2 2 0 00-2-2H4zm10.5 4a.5.5 0 00-.5-.5h-3a.5.5 0 000 1h3a.5.5 0 00.5-.5zM4 8a.5.5 0 01.5-.5h11a.5.5 0 010 1h-11A.5.5 0 014 8zm0 2a.5.5 0 01.5-.5h5a.5.5 0 010 1h-5A.5.5 0 014 10zm11.5 2.5a.5.5 0 00-.5-.5h-3a.5.5 0 000 1h3a.5.5 0 00.5-.5zM4 14a.5.5 0 01.5-.5h11a.5.5 0 010 1h-11a.5.5 0 01-.5-.5z" clip-rule="evenodd" /></svg>
@@ -240,7 +239,7 @@
         </div>
     </div>
     
-    <!-- OCR Scanner Modal - Added -->
+    <!-- OCR Scanner Modal -->
     <div id="ocrScannerModal" class="fixed inset-0 bg-black bg-opacity-75 flex flex-col items-center justify-center p-4 z-50 hidden">
         <div class="bg-white p-4 rounded-lg shadow-xl w-full max-w-lg text-center">
             <p class="text-center text-gray-600 mb-2">วางตัวเลขในกรอบสี่เหลี่ยม</p>
@@ -253,11 +252,11 @@
             </div>
             <div class="flex gap-4">
                  <button id="ocrCaptureBtn" class="w-full bg-blue-600 text-white font-bold py-2 px-4 rounded-md hover:bg-blue-700 disabled:bg-gray-400">
-                    สแกน
-                </button>
-                <button id="closeOcrScannerBtn" class="w-full bg-red-600 text-white font-bold py-2 px-4 rounded-md hover:bg-red-700">
-                    ปิดกล้อง
-                </button>
+                     สแกน
+                 </button>
+                 <button id="closeOcrScannerBtn" class="w-full bg-red-600 text-white font-bold py-2 px-4 rounded-md hover:bg-red-700">
+                     ปิดกล้อง
+                 </button>
             </div>
         </div>
     </div>
@@ -326,7 +325,7 @@
         const closeScannerBtn = document.getElementById('closeScannerBtn');
         let html5Qrcode;
 
-        // OCR Elements - Added
+        // OCR Elements
         const ocrScanBtn = document.getElementById('ocrScanBtn');
         const ocrScannerModal = document.getElementById('ocrScannerModal');
         const ocrVideo = document.getElementById('ocr-video');
@@ -361,7 +360,8 @@
         // Firebase State
         let db;
         let unsubscribeListeners = [];
-        let appId; // Globally accessible app ID
+        // Use __app_id provided by the environment, with a fallback from the hardcoded config.
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
 
         async function initializeFirebase(firebaseConfig, loggedInUser, isAdmin) {
             try {
@@ -423,20 +423,24 @@
                 initializeOCR(); // Prepare OCR in the background
             }
 
-            const firebaseConfig = {
-                apiKey: "AIzaSyC4KDnkJ_3Md1hHqr3pu5IxbDuSwUz7-vY",
-                authDomain: "coerf-a033d.firebaseapp.com",
-                projectId: "coerf-a033d",
-                storageBucket: "coerf-a033d.firebasestorage.app",
-                messagingSenderId: "1004453397450",
-                appId: "1:1004453397450:web:83825d12550e8ecf940533",
-                measurementId: "G-TBKV4XWWM7"
-            };
-            appId = firebaseConfig.appId;
+            // Use __firebase_config if available, otherwise use hardcoded fallback.
+            const firebaseConfig = typeof __firebase_config !== 'undefined'
+                ? JSON.parse(__firebase_config)
+                : { // Fallback config for local testing
+                    apiKey: "AIzaSyC4KDnkJ_3Md1hHqr3pu5IxbDuSwUz7-vY",
+                    authDomain: "coerf-a033d.firebaseapp.com",
+                    projectId: "coerf-a033d",
+                    storageBucket: "coerf-a033d.appspot.com",
+                    messagingSenderId: "1004453397450",
+                    appId: "1:1004453397450:web:83825d12550e8ecf940533",
+                    measurementId: "G-TBKV4XWWM7"
+                };
 
-            if (!firebaseConfig.apiKey) {
+            if (!firebaseConfig || !firebaseConfig.apiKey) {
                  const container = isAdmin ? adminContainer : appContainer;
-                 container.innerHTML = `<div class="col-span-full text-center bg-white p-8 rounded-xl shadow-lg"><h2 class="text-2xl font-bold text-red-600 mb-4">ข้อผิดพลาดร้ายแรง</h2><p class="text-sm text-gray-700 mb-4">ไม่พบข้อมูลการกำหนดค่า Firebase</p></div>`;
+                 container.innerHTML = `<div class="col-span-full text-center bg-white p-8 rounded-xl shadow-lg"><h2 class="text-2xl font-bold text-red-600 mb-4">ข้อผิดพลาดร้ายแรง</h2><p class="text-sm text-gray-700 mb-4">ไม่พบข้อมูลการกำหนดค่า Firebase (__firebase_config)</p></div>`;
+                 container.classList.remove('hidden');
+                 loginScreen.classList.add('hidden');
                  return;
             }
             
@@ -600,14 +604,14 @@
              
              activeTimers.forEach(timer => {
                  if(!document.getElementById(`timer-${timer.user.id}`)) {
-                   createTimerCard(timer.user, timer.owner, timer.completionTime);
+                  createTimerCard(timer.user, timer.owner, timer.completionTime);
                  }
              });
 
              if (activeTimers.length > 0) startGlobalAnimationLoop();
              renderHistory();
              renderUserList(idInput.value.trim());
-       }
+        }
         
         function initializeAudio() {
             if (Tone.context.state !== 'running') Tone.context.resume();
@@ -748,7 +752,7 @@
                                          <button onclick="recordResult('${user.id}', '${completionTime}', 'ผลลบ (-)')" class="bg-blue-500 text-white px-3 py-1 rounded text-sm hover:bg-blue-600">ผลลบ (-)</button>
                                      </div>
                                  </div>` : ''}
-                     ${!owner ? `<button onclick="cancelTimer('${user.id}')" class="text-white/70 hover:text-white p-2 rounded-full transition-colors self-center">
+                    ${!owner ? `<button onclick="cancelTimer('${user.id}')" class="text-white/70 hover:text-white p-2 rounded-full transition-colors self-center">
                                      <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm4 0a1 1 0 012 0v6a1 1 0 11-2 0V8z" clip-rule="evenodd"></path></svg>
                                    </button>` : ''}
                 </div>
@@ -994,7 +998,7 @@
             notificationModal.classList.remove('hidden');
         }
         
-        // --- OCR Functions - Added ---
+        // --- OCR Functions ---
         async function initializeOCR() {
             if (tesseractWorker) return;
             ocrStatusEl.innerHTML = '<div class="ocr-loader w-5 h-5 border-2 border-gray-200 border-t-blue-500 rounded-full animate-spin"></div><p class="ml-2 text-sm">กำลังเตรียมระบบ OCR...</p>';
@@ -1015,23 +1019,27 @@
             try {
                 const devices = await navigator.mediaDevices.enumerateDevices();
                 const videoDevices = devices.filter(device => device.kind === 'videoinput');
-                let selectedDevice = videoDevices.find(device => device.label.toLowerCase().includes('ultra'));
+                // Attempt to find the ultra-wide camera, common on iOS devices.
+                let selectedDevice = videoDevices.find(device => device.label.toLowerCase().includes('ultra wide'));
                 const constraints = { video: {} };
                 if (selectedDevice) {
+                    console.log('Found ultra wide camera:', selectedDevice.label);
                     constraints.video.deviceId = { exact: selectedDevice.deviceId };
                 } else {
+                    console.log('Ultra wide camera not found, defaulting to environment facingMode.');
                     constraints.video.facingMode = 'environment';
                 }
                 stream = await navigator.mediaDevices.getUserMedia(constraints);
             } catch (err) {
                  console.warn("Could not get preferred camera, falling back.", err);
-                try {
-                    stream = await navigator.mediaDevices.getUserMedia({ video: true });
-                } catch (fallbackErr) {
-                    console.error("Error accessing any camera: ", fallbackErr);
-                    ocrStatusEl.textContent = 'ข้อผิดพลาด: ไม่สามารถเปิดกล้องได้';
-                    return;
-                }
+                 try {
+                     // Fallback specifically to the rear camera if the initial attempt fails.
+                     stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+                 } catch (fallbackErr) {
+                     console.error("Error accessing any camera: ", fallbackErr);
+                     ocrStatusEl.textContent = 'ข้อผิดพลาด: ไม่สามารถเปิดกล้องได้';
+                     return;
+                 }
             }
             if (stream) {
                 ocrVideo.srcObject = stream;
@@ -1335,7 +1343,7 @@
             notificationModal.classList.add('hidden');
         });
 
-        // --- OCR Event Listeners - Added ---
+        // --- OCR Event Listeners ---
         ocrScanBtn.addEventListener('click', () => {
             ocrScannerModal.classList.remove('hidden');
             ocrCaptureBtn.disabled = true;
@@ -1391,7 +1399,7 @@
                             // Reset status message after a delay
                             setTimeout(() => {
                                 if (ocrStatusEl.innerHTML.includes(longestNumber)) {
-                                   ocrStatusEl.innerHTML = '<p>ระบบพร้อมแล้ว</p>';
+                                    ocrStatusEl.innerHTML = '<p>ระบบพร้อมแล้ว</p>';
                                 }
                             }, 3000);
                         }
