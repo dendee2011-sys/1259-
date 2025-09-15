@@ -1041,15 +1041,16 @@
         
         scanBtn.addEventListener('click', () => {
             scannerModal.classList.remove('hidden');
-            
+
             if (!html5Qrcode) {
-                html5Qrcode = new Html5Qrcode("reader");
+                // Pass true for verbose logging to the console.
+                html5Qrcode = new Html5Qrcode("reader", true);
             }
 
             const config = { fps: 10, qrbox: { width: 250, height: 250 } };
-            
-            html5Qrcode.start({ facingMode: "environment" }, config, 
-                (decodedText, decodedResult) => { // onScanSuccess
+
+            const onScanSuccess = (decodedText, decodedResult) => {
+                if (html5Qrcode.isScanning) {
                     html5Qrcode.stop().then(() => {
                         scannerModal.classList.add('hidden');
                         if (/^\d{13}$/.test(decodedText)) {
@@ -1057,22 +1058,44 @@
                         } else {
                             updateStatusMessage('บาร์โค้ดไม่ถูกต้อง (ต้องเป็นเลข 13 หลัก)', 'error');
                         }
+                    }).catch(err => {
+                        console.error("Failed to stop scanner after success", err);
+                        scannerModal.classList.add('hidden');
                     });
-                }, 
-                (errorMessage) => { // onScanFailure
-                    // ignore
-                })
-                .catch(err => {
-                    console.error("Unable to start scanning.", err);
-                    let errorMessage = `ไม่สามารถเปิดกล้องได้: ${err.name || err}`;
-                    if (err.name === "NotAllowedError") {
-                        errorMessage = "กรุณาอนุญาตให้เว็บเบราว์เซอร์เข้าถึงกล้องของคุณ";
-                    } else if (err.name === "NotFoundError") {
-                        errorMessage = "ไม่พบกล้องในอุปกรณ์ของคุณ";
-                    }
-                    showNotification('เกิดข้อผิดพลาด', errorMessage);
-                    scannerModal.classList.add('hidden');
-                });
+                }
+            };
+            
+            const onScanFailure = (error) => {
+                // This callback is called frequently, so we'll ignore it to avoid spamming the console.
+            };
+
+            // First, check for camera permissions and availability.
+            Html5Qrcode.getCameras().then(cameras => {
+                if (cameras && cameras.length) {
+                    // Start scanning, preferring the back camera.
+                    html5Qrcode.start(
+                        { facingMode: "environment" },
+                        config,
+                        onScanSuccess,
+                        onScanFailure
+                    ).catch(err => {
+                        console.error("Error starting scanner:", err);
+                        showNotification('เกิดข้อผิดพลาด', 'ไม่สามารถเริ่มการสแกนได้ อาจมีบางอย่างขัดข้อง');
+                        scannerModal.classList.add('hidden');
+                    });
+                } else {
+                     showNotification('เกิดข้อผิดพลาด', 'ไม่พบกล้องในอุปกรณ์ของคุณ');
+                     scannerModal.classList.add('hidden');
+                }
+            }).catch(err => {
+                console.error("Error getting camera permissions:", err);
+                let errorMessage = `ไม่สามารถเข้าถึงกล้องได้: ${err.name || err}`;
+                if (err.name === "NotAllowedError") {
+                    errorMessage = "คุณต้องอนุญาตให้เบราว์เซอร์ใช้กล้อง กรุณาตรวจสอบการตั้งค่าของเว็บไซต์นี้ในเบราว์เซอร์ของคุณ";
+                }
+                showNotification('เกิดข้อผิดพลาด', errorMessage);
+                scannerModal.classList.add('hidden');
+            });
         });
 
         closeScannerBtn.addEventListener('click', () => {
