@@ -1049,55 +1049,59 @@
             cancelBtn.addEventListener('click', removeConfirmation);
         });
         
-        scanBtn.addEventListener('click', async () => {
-             // First, request camera permission. This will trigger the browser's permission prompt.
-            try {
-                cameraStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
-            } catch (err) {
-                console.error("Camera permission error:", err);
-                showNotification('เกิดข้อผิดพลาด', 'กรุณาอนุญาตให้เบราว์เซอร์เข้าถึงกล้องเพื่อใช้งานฟังก์ชันสแกน');
-                return; // Stop execution if permission is denied.
-            }
+        scanBtn.addEventListener('click', () => {
+            const readerLoading = document.getElementById('reader-loading');
             
             scannerModal.classList.remove('hidden');
             readerLoading.classList.remove('hidden');
-            scannerVideo.srcObject = cameraStream;
-            scannerVideo.play();
+            document.getElementById('reader').innerHTML = '';
 
-            const barcodeDetector = new BarcodeDetector();
-            
-            scanInterval = setInterval(async () => {
-                try {
-                    const barcodes = await barcodeDetector.detect(scannerVideo);
-                    if (barcodes.length > 0) {
-                        const barcode = barcodes[0];
-                        if (/^\d+$/.test(barcode.rawValue)) {
-                            closeScannerBtn.click();
-                            startProcess(barcode.rawValue);
-                        }
+            // Use requestAnimationFrame to ensure the DOM is ready for the camera
+            requestAnimationFrame(() => {
+                // We are creating a new instance every time to ensure a clean state
+                html5Qrcode = new Html5Qrcode("reader", { verbose: false });
+
+                const config = { 
+                    fps: 10, 
+                    qrbox: { width: 250, height: 250 },
+                    rememberLastUsedCamera: true
+                };
+
+                const onScanSuccess = (decodedText, decodedResult) => {
+                    if (/^\d+$/.test(decodedText)) {
+                        closeScannerBtn.click(); 
+                        startProcess(decodedText);
                     }
-                } catch (e) {
-                    console.error("Barcode detection failed:", e);
-                    // The loop will continue trying.
-                }
-            }, 200); // Check for barcode every 200ms
+                };
 
-            scannerVideo.addEventListener('loadeddata', () => {
-                readerLoading.classList.add('hidden');
-            });
+                html5Qrcode.start(
+                    { facingMode: "environment" },
+                    config,
+                    onScanSuccess,
+                    (errorMessage) => { /* ignore */ }
+                )
+                .then(() => {
+                    readerLoading.classList.add('hidden');
+                })
+                .catch((err) => {
+                    console.error(`Unable to start scanning, error: ${err}`);
+                    showNotification('เกิดข้อผิดพลาด', `ไม่สามารถเริ่มการสแกนได้: กรุณาตรวจสอบว่าคุณได้อนุญาตให้เบราว์เซอร์เข้าถึงกล้องแล้ว`);
+                    closeScannerBtn.click();
+                });
+            }); 
         });
 
-        closeScannerBtn.addEventListener('click', () => {
-            if (cameraStream) {
-                cameraStream.getTracks().forEach(track => track.stop());
-            }
-            if (scanInterval) {
-                clearInterval(scanInterval);
+        closeScannerBtn.addEventListener('click', async () => {
+            if (html5Qrcode && html5Qrcode.isScanning) {
+                try {
+                    await html5Qrcode.stop();
+                    await html5Qrcode.clear();
+                } catch (err) {
+                    console.error("Error stopping or clearing scanner.", err);
+                }
             }
             scannerModal.classList.add('hidden');
-            scannerVideo.srcObject = null;
-            cameraStream = null;
-            scanInterval = null;
+            html5Qrcode = null;
         });
 
         if (masterResetBtn) {
@@ -1214,3 +1218,4 @@
     </script>
 </body>
 </html>
+
