@@ -6,6 +6,7 @@
     <title>ระบบนับเวลาพร้อมกันหลายคน</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.js"></script>
+    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap" rel="stylesheet">
@@ -61,6 +62,11 @@
             25% { transform: translateX(-5px); }
             75% { transform: translateX(5px); }
         }
+        #reader video {
+            width: 100% !important;
+            height: auto !important;
+            border-radius: 0.5rem;
+        }
     </style>
 </head>
 <body class="bg-gray-100 min-h-screen p-4">
@@ -114,8 +120,13 @@
                     </button>
                 </div>
                 
-                <input type="text" id="idInput" class="block w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-base mb-4 transition" placeholder="ยิงบาร์โค้ด หรือ ค้นหา...">
-                
+                <div class="flex items-center gap-2 mb-4">
+                    <input type="text" id="idInput" class="block w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-base transition" placeholder="ยิงบาร์โค้ด หรือ ค้นหา...">
+                    <button id="scanBtn" class="p-2.5 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4 2a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2V4a2 2 0 00-2-2H4zm10.5 4a.5.5 0 00-.5-.5h-3a.5.5 0 000 1h3a.5.5 0 00.5-.5zM4 8a.5.5 0 01.5-.5h11a.5.5 0 010 1h-11A.5.5 0 014 8zm0 2a.5.5 0 01.5-.5h5a.5.5 0 010 1h-5A.5.5 0 014 10zm11.5 2.5a.5.5 0 00-.5-.5h-3a.5.5 0 000 1h3a.5.5 0 00.5-.5zM4 14a.5.5 0 01.5-.5h11a.5.5 0 010 1h-11a.5.5 0 01-.5-.5z" clip-rule="evenodd" /></svg>
+                    </button>
+                </div>
+
                 <div id="userListContainer" class="flex-grow overflow-y-auto bg-gray-50 p-2 border rounded-lg min-h-[20rem]">
                      <div id="listStatus" class="p-4 text-center"></div>
                      <ul id="userList" class="space-y-1"></ul>
@@ -149,7 +160,7 @@
                             <th scope="col" class="px-6 py-3">ชื่อ-สกุล</th>
                             <th scope="col" class="px-6 py-3">เวลาตั้งค่า</th>
                             <th scope="col" class="px-6 py-3">เวลาที่ครบกำหนด</th>
-                            <th scope="col" class="px-6 py-3">สถานะ</th>
+                            <th scope="col" class="px-6 py-3">ผลการตรวจ</th>
                             <th scope="col" class="px-6 py-3"><span class="sr-only">ลบ</span></th>
                         </tr>
                     </thead>
@@ -168,12 +179,28 @@
                 <h1 class="text-2xl font-bold text-gray-800">มุมมองผู้ดูแลระบบ - ประวัติทั้งหมด</h1>
                 <p class="text-indigo-600 font-bold" id="adminLoggedInUserDisplay"></p>
             </div>
-            <button id="adminLogoutBtn" class="bg-gray-500 text-white font-bold py-2 px-4 rounded-md hover:bg-gray-600 transition">
-                ออกจากระบบ
-            </button>
+            <div class="flex items-center gap-4">
+                <button id="downloadExcelBtn" class="bg-green-600 text-white font-bold py-2 px-4 rounded-md hover:bg-green-700 transition">
+                    ดาวน์โหลด Excel
+                </button>
+                <button id="adminLogoutBtn" class="bg-gray-500 text-white font-bold py-2 px-4 rounded-md hover:bg-gray-600 transition">
+                    ออกจากระบบ
+                </button>
+            </div>
         </div>
         <div id="adminGrid" class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6">
             <!-- Admin columns will be generated here -->
+        </div>
+    </div>
+
+    <!-- Scanner Modal -->
+    <div id="scannerModal" class="fixed inset-0 bg-black bg-opacity-75 flex flex-col items-center justify-center p-4 z-50 hidden">
+        <div class="bg-white p-4 rounded-lg shadow-xl w-full max-w-md">
+            <p class="text-center text-gray-600 mb-2">วางบาร์โค้ดในกรอบสี่เหลี่ยม</p>
+            <div id="reader" class="w-full"></div>
+            <button id="closeScannerBtn" class="w-full mt-4 bg-red-600 text-white font-bold py-2 px-4 rounded-md hover:bg-red-700">
+                ปิดกล้อง
+            </button>
         </div>
     </div>
 
@@ -201,6 +228,7 @@
         const loginError = document.getElementById('loginError');
         const logoutBtn = document.getElementById('logoutBtn');
         const adminLogoutBtn = document.getElementById('adminLogoutBtn');
+        const downloadExcelBtn = document.getElementById('downloadExcelBtn');
 
         // Main Page Elements
         const idInput = document.getElementById('idInput');
@@ -219,6 +247,12 @@
         const adminContainer = document.getElementById('adminContainer');
         const loggedInUserDisplay = document.getElementById('loggedInUserDisplay');
         const adminLoggedInUserDisplay = document.getElementById('adminLoggedInUserDisplay');
+        
+        // Scanner Elements
+        const scanBtn = document.getElementById('scanBtn');
+        const scannerModal = document.getElementById('scannerModal');
+        const closeScannerBtn = document.getElementById('closeScannerBtn');
+        let html5Qrcode;
 
 
         // App State
@@ -227,7 +261,8 @@
         let activeTimers = [];
         let historyData = [];
         let sessionDefaultTimeInSeconds = null;
-        let globalLocks = {}; // To store the global lock state
+        let userSnapshots = {};
+        let globalLocks = {}; 
 
         // Sound Synthesizers
         let successSynth, errorSynth;
@@ -376,7 +411,7 @@
                                 <tr>
                                     <th scope="col" class="px-2 py-2">#</th>
                                     <th scope="col" class="px-2 py-2">ชื่อ-สกุล</th>
-                                    <th scope="col" class="px-2 py-2">เวลาครบกำหนด</th>
+                                    <th scope="col" class="px-2 py-2">ผลการตรวจ</th>
                                 </tr>
                             </thead>
                             <tbody id="historyBody-${user}">
@@ -392,6 +427,7 @@
                 const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'countdownData', username);
                 const unsubscribe = onSnapshot(docRef, (docSnap) => {
                     const userData = docSnap.exists() ? docSnap.data() : {};
+                    userSnapshots[username] = userData;
                     const historyData = userData.timerHistory || [];
                     const tbody = document.getElementById(`historyBody-${username}`);
                     if (tbody) {
@@ -412,15 +448,17 @@
                 const row = document.createElement('tr');
                 row.className = 'bg-white border-b';
 
-                let completionTimeFormatted = '-';
-                if (entry.completionTime) {
-                    completionTimeFormatted = new Date(entry.completionTime).toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                let statusHtml = `<span class="bg-gray-100 text-gray-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded">${entry.status}</span>`;
+                if (entry.status === 'ผลบวก (+)') {
+                    statusHtml = `<span class="bg-green-100 text-green-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded">${entry.status}</span>`;
+                } else if (entry.status === 'ผลลบ (-)') {
+                    statusHtml = `<span class="bg-blue-100 text-blue-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded">${entry.status}</span>`;
                 }
 
                 row.innerHTML = `
                     <td class="px-2 py-2 font-medium text-gray-900">${data.length - index}</td>
                     <td class="px-2 py-2">${entry.user.fullName}<br><span class="text-xs text-gray-400">${entry.user.id}</span></td>
-                    <td class="px-2 py-2">${completionTimeFormatted}</td>
+                    <td class="px-2 py-2">${statusHtml}</td>
                 `;
                 tbody.appendChild(row);
             });
@@ -499,18 +537,17 @@
         
         function renderUserList(filter = '') {
             userList.innerHTML = '';
-            if (!filter) {
-                return; 
-            }
             const lowerCaseFilter = filter.toLowerCase();
             const filteredUsers = allUsers.filter(user => user.fullName.toLowerCase().includes(lowerCaseFilter) || user.id.includes(filter));
             
-            if (filteredUsers.length === 0) {
+            const usersToDisplay = filter ? filteredUsers : allUsers;
+
+            if (usersToDisplay.length === 0 && filter) {
                  userList.innerHTML = `<div class="p-4 text-gray-500">ไม่พบรายชื่อที่ตรงกัน</div>`;
                  return;
             }
 
-            filteredUsers.forEach(user => {
+            usersToDisplay.forEach(user => {
                 const li = document.createElement('li');
                 li.dataset.id = user.id;
                 let content = `<span class="font-bold">${user.fullName}</span><br><span class="text-sm text-gray-500">${user.id}</span>`;
@@ -593,7 +630,7 @@
                     ${ownerHtml}
                 </div>
                 <div class="font-mono text-4xl font-bold tracking-tighter mr-4" data-timer-display="true">00:00:00.000</div>
-                ${!owner ? `<button onclick="deleteTimer('${user.id}')" class="delete-btn p-2 rounded-full hover:bg-red-700"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24" 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg></button>` : ''}
+                ${!owner ? `<div class="delete-btn-container w-24 text-center"><button onclick="deleteTimer('${user.id}')" class="delete-btn p-2 rounded-full hover:bg-red-700"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24" 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg></button></div>` : ''}
             `;
             activeTimersContainer.prepend(card);
         }
@@ -646,7 +683,18 @@
                     const userInArray = allUsers.find(u => u.id === timer.user.id);
                     if (userInArray && !userInArray.completed) {
                         userInArray.completed = true;
-                        addToHistory(timer.user, 'หมดเวลา', timer.duration);
+                        const completionTime = new Date().toISOString();
+                        addToHistory(timer.user, 'รอผล', timer.duration, completionTime);
+                        
+                        const buttonContainer = card.querySelector('.delete-btn-container');
+                        if (buttonContainer) {
+                            buttonContainer.innerHTML = `
+                                <div class="flex flex-col space-y-2">
+                                    <button onclick="recordResult('${timer.user.id}', '${completionTime}', 'ผลบวก (+)')" class="bg-green-500 text-white px-3 py-1 rounded text-sm hover:bg-green-600">ผลบวก (+)</button>
+                                    <button onclick="recordResult('${timer.user.id}', '${completionTime}', 'ผลลบ (-)')" class="bg-blue-500 text-white px-3 py-1 rounded text-sm hover:bg-blue-600">ผลลบ (-)</button>
+                                </div>
+                            `;
+                        }
                     }
                 }
             });
@@ -659,6 +707,25 @@
             }
         }
         
+        window.recordResult = async function(userId, completionTime, result) {
+            const historyIndex = historyData.findIndex(item => item.completionTime === completionTime);
+            if (historyIndex > -1) {
+                historyData[historyIndex].status = result;
+                await saveState();
+            }
+
+            await removeGlobalLock(userId);
+            const card = document.getElementById(`timer-${userId}`);
+            if (card) card.remove();
+            activeTimers = activeTimers.filter(timer => timer.user.id !== userId);
+
+            if (activeTimers.length === 0) {
+                if (!document.getElementById('timerPlaceholder')) {
+                   activeTimersContainer.innerHTML = '<div id="timerPlaceholder" class="text-center text-gray-400 flex items-center justify-center h-full"><p>ยิงบาร์โค้ดเพื่อเริ่มนับเวลา...</p></div>';
+                }
+            }
+        }
+
         function startGlobalAnimationLoop() {
             if (!globalAnimationFrameId) {
                 globalAnimationFrameId = requestAnimationFrame(globalAnimationLoop);
@@ -692,8 +759,16 @@
                 if (entry.completionTime) {
                     completionTimeFormatted = new Date(entry.completionTime).toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
                 }
+                
+                let statusHtml = `<span class="bg-gray-100 text-gray-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded">${entry.status}</span>`;
+                if (entry.status === 'ผลบวก (+)') {
+                    statusHtml = `<span class="bg-green-100 text-green-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded">${entry.status}</span>`;
+                } else if (entry.status === 'ผลลบ (-)') {
+                    statusHtml = `<span class="bg-blue-100 text-blue-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded">${entry.status}</span>`;
+                }
 
-                row.innerHTML = `<td class="px-6 py-4 font-medium text-gray-900">${historyData.length - index}</td><td class="px-6 py-4">${entry.user.fullName} ${ownerHtml}<br><span class="text-xs text-gray-500">${entry.user.id}</span></td><td class="px-6 py-4">${timeFormatted}</td><td class="px-6 py-4">${completionTimeFormatted}</td><td class="px-6 py-4"><span class="bg-red-100 text-red-800 text-xs font-medium mr-2 px-2-5 py-0-5 rounded">${entry.status}</span></td><td class="px-6 py-4 text-right"><button onclick="deleteHistoryItem('${entry.completionTime}')" class="text-red-500 hover:text-red-700"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg></button></td>`;
+
+                row.innerHTML = `<td class="px-6 py-4 font-medium text-gray-900">${historyData.length - index}</td><td class="px-6 py-4">${entry.user.fullName} ${ownerHtml}<br><span class="text-xs text-gray-500">${entry.user.id}</span></td><td class="px-6 py-4">${timeFormatted}</td><td class="px-6 py-4">${completionTimeFormatted}</td><td class="px-6 py-4">${statusHtml}</td><td class="px-6 py-4 text-right">${!isAdminView ? `<button onclick="deleteHistoryItem('${entry.completionTime}')" class="text-red-500 hover:text-red-700"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg></button>` : ''}</td>`;
                 historyBody.appendChild(row);
             });
         }
@@ -703,8 +778,8 @@
             saveState();
         }
 
-        function addToHistory(user, status, durationMs) {
-            const historyEntry = { user, status, durationMs, completionTime: new Date().toISOString() };
+        function addToHistory(user, status, durationMs, completionTime) {
+            const historyEntry = { user, status, durationMs, completionTime };
             historyData.unshift(historyEntry);
             renderHistory();
             if (sessionStorage.getItem('isAdmin') !== 'true') {
@@ -890,6 +965,45 @@
 
             cancelBtn.addEventListener('click', removeConfirmation);
         });
+        
+        scanBtn.addEventListener('click', () => {
+            scannerModal.classList.remove('hidden');
+            
+            if (!html5Qrcode) {
+                html5Qrcode = new Html5Qrcode("reader");
+            }
+
+            const config = { fps: 10, qrbox: { width: 250, height: 250 } };
+            
+            html5Qrcode.start({ facingMode: "environment" }, config, 
+                (decodedText, decodedResult) => { // onScanSuccess
+                    html5Qrcode.stop().then(() => {
+                      scannerModal.classList.add('hidden');
+                      if (/^\d{13}$/.test(decodedText)) {
+                          startProcess(decodedText);
+                      } else {
+                          updateStatusMessage('บาร์โค้ดไม่ถูกต้อง (ต้องเป็นเลข 13 หลัก)', 'error');
+                      }
+                    });
+                }, 
+                (errorMessage) => { // onScanFailure
+                    // ignore
+                })
+                .catch(err => {
+                    console.error("Unable to start scanning.", err);
+                    alert(`ไม่สามารถเปิดกล้องได้: ${err}`);
+                    scannerModal.classList.add('hidden');
+                });
+        });
+
+        closeScannerBtn.addEventListener('click', () => {
+            if (html5Qrcode && html5Qrcode.isScanning) {
+                html5Qrcode.stop()
+                    .catch(err => console.error("Failed to stop scanner on close", err));
+            }
+            scannerModal.classList.add('hidden');
+        });
+
 
     </script>
 </body>
