@@ -125,7 +125,6 @@
                           <ul id="userList" class="space-y-1 p-1"></ul>
                      </div>
                  </div>
-
                  <button id="resetAllBtn" class="w-full mt-4 bg-red-600 text-white font-bold py-2 px-4 rounded-md hover:bg-red-700 transition">
                      รีเซ็ตข้อมูลทั้งหมด
                  </button>
@@ -175,6 +174,9 @@
                  <p class="text-indigo-600 font-bold" id="adminLoggedInUserDisplay"></p>
              </div>
              <div class="flex items-center gap-4">
+                 <button id="masterResetBtn" class="bg-red-600 text-white font-bold py-2 px-4 rounded-md hover:bg-red-700 transition">
+                    รีเซ็ตระบบทั้งหมด
+                 </button>
                  <button id="downloadExcelBtn" class="bg-green-600 text-white font-bold py-2 px-4 rounded-md hover:bg-green-700 transition">
                      ดาวน์โหลด Excel
                  </button>
@@ -199,7 +201,7 @@
                         <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                     </svg>
                 </div>
-                <div id="reader" class="w-full"></div>
+                 <div id="reader" class="w-full"></div>
             </div>
             <button id="closeScannerBtn" class="w-full mt-4 bg-red-600 text-white font-bold py-2 px-4 rounded-md hover:bg-red-700">
                 ปิดกล้อง
@@ -270,6 +272,9 @@
         const closeScannerBtn = document.getElementById('closeScannerBtn');
         let html5Qrcode;
         
+        // Admin Elements
+        const masterResetBtn = document.getElementById('masterResetBtn');
+
         // Notification Modal Elements
         const notificationModal = document.getElementById('notificationModal');
         const notificationTitle = document.getElementById('notificationTitle');
@@ -316,10 +321,8 @@
                             setupSnapshotListener(appDataDocRef);
                         }
                     }
-                    // The 'else' case (user is null) is handled by the initial sign-in attempt below.
                 });
 
-                // Trigger the authentication process if not already signed in
                 if (!auth.currentUser) {
                     const token = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
                     if (token) {
@@ -355,7 +358,6 @@
                 document.body.addEventListener('keydown', () => initializeAudio(), { once: true });
             }
 
-            // --- Re-added hardcoded Firebase config ---
             const firebaseConfig = {
                 apiKey: "AIzaSyC4KDnkJ_3Md1hHqr3pu5IxbDuSwUz7-vY",
                 authDomain: "coerf-a033d.firebaseapp.com",
@@ -365,7 +367,7 @@
                 appId: "1:1004453397450:web:83825d12550e8ecf940533",
                 measurementId: "G-TBKV4XWWM7"
             };
-            appId = firebaseConfig.appId; // Set the global appId
+            appId = firebaseConfig.appId;
 
             if (!firebaseConfig.apiKey) {
                  const container = isAdmin ? adminContainer : appContainer;
@@ -1047,63 +1049,115 @@
             cancelBtn.addEventListener('click', removeConfirmation);
         });
         
-        scanBtn.addEventListener('click', () => {
-            const readerLoading = document.getElementById('reader-loading');
+        scanBtn.addEventListener('click', async () => {
+             // First, request camera permission. This will trigger the browser's permission prompt.
+            try {
+                cameraStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+            } catch (err) {
+                console.error("Camera permission error:", err);
+                showNotification('เกิดข้อผิดพลาด', 'กรุณาอนุญาตให้เบราว์เซอร์เข้าถึงกล้องเพื่อใช้งานฟังก์ชันสแกน');
+                return; // Stop execution if permission is denied.
+            }
             
             scannerModal.classList.remove('hidden');
             readerLoading.classList.remove('hidden');
-            document.getElementById('reader').innerHTML = '';
+            scannerVideo.srcObject = cameraStream;
+            scannerVideo.play();
 
-            // Use a timeout to allow the modal to render before initializing the camera
-            setTimeout(() => {
-                if (html5Qrcode) {
-                    html5Qrcode.clear().catch(e => {});
-                }
-                
-                html5Qrcode = new Html5Qrcode("reader", { verbose: false });
-
-                const config = { 
-                    fps: 10, 
-                    qrbox: { width: 250, height: 250 },
-                    rememberLastUsedCamera: true
-                };
-
-                const onScanSuccess = (decodedText, decodedResult) => {
-                    if (/^\d+$/.test(decodedText)) {
-                        closeScannerBtn.click(); 
-                        startProcess(decodedText);
-                    }
-                };
-
-                html5Qrcode.start(
-                    { facingMode: "environment" },
-                    config,
-                    onScanSuccess,
-                    (errorMessage) => { /* ignore */ }
-                )
-                .then(() => {
-                    readerLoading.classList.add('hidden');
-                })
-                .catch((err) => {
-                    console.error(`Unable to start scanning, error: ${err}`);
-                    showNotification('เกิดข้อผิดพลาด', `ไม่สามารถเริ่มการสแกนได้: กรุณาตรวจสอบว่าคุณได้อนุญาตให้เบราว์เซอร์เข้าถึงกล้องแล้ว`);
-                    closeScannerBtn.click();
-                });
-            }, 100); 
-        });
-
-        closeScannerBtn.addEventListener('click', async () => {
-            scannerModal.classList.add('hidden');
-            if (html5Qrcode && html5Qrcode.isScanning) {
+            const barcodeDetector = new BarcodeDetector();
+            
+            scanInterval = setInterval(async () => {
                 try {
-                    await html5Qrcode.stop();
-                    await html5Qrcode.clear();
-                } catch (err) {
-                    console.error("Error stopping or clearing scanner.", err);
+                    const barcodes = await barcodeDetector.detect(scannerVideo);
+                    if (barcodes.length > 0) {
+                        const barcode = barcodes[0];
+                        if (/^\d+$/.test(barcode.rawValue)) {
+                            closeScannerBtn.click();
+                            startProcess(barcode.rawValue);
+                        }
+                    }
+                } catch (e) {
+                    console.error("Barcode detection failed:", e);
+                    // The loop will continue trying.
                 }
-            }
-            html5Qrcode = null;
+            }, 200); // Check for barcode every 200ms
+
+            scannerVideo.addEventListener('loadeddata', () => {
+                readerLoading.classList.add('hidden');
+            });
         });
+
+        closeScannerBtn.addEventListener('click', () => {
+            if (cameraStream) {
+                cameraStream.getTracks().forEach(track => track.stop());
+            }
+            if (scanInterval) {
+                clearInterval(scanInterval);
+            }
+            scannerModal.classList.add('hidden');
+            scannerVideo.srcObject = null;
+            cameraStream = null;
+            scanInterval = null;
+        });
+
+        if (masterResetBtn) {
+            masterResetBtn.addEventListener('click', () => {
+                if (document.getElementById('masterResetConfirmationDiv')) return;
+
+                const confirmationDiv = document.createElement('div');
+                confirmationDiv.id = 'masterResetConfirmationDiv';
+                confirmationDiv.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+                
+                confirmationDiv.innerHTML = `
+                    <div class="bg-white p-6 rounded-lg shadow-xl w-full max-w-sm">
+                        <h3 class="text-lg font-bold text-gray-800 mb-2">ยืนยันการรีเซ็ตระบบทั้งหมด</h3>
+                        <p class="text-sm text-gray-600 mb-4">การดำเนินการนี้จะล้างสถานะ "กำลังนับ" และ "เสร็จสิ้น" ทั้งหมดของทุกคน แต่จะไม่ลบประวัติการทำงานของผู้ใช้แต่ละคน</p>
+                        <label for="masterResetPasswordInput" class="block text-sm font-medium text-gray-700 mb-2">กรุณาใส่รหัส 3215 เพื่อยืนยัน</label>
+                        <input type="password" id="masterResetPasswordInput" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                        <div class="flex gap-2 mt-3">
+                            <button id="confirmMasterResetBtn" class="flex-1 bg-red-600 text-white font-bold py-2 px-4 rounded-md hover:bg-red-700 transition">ยืนยัน</button>
+                            <button id="cancelMasterResetBtn" class="flex-1 bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded-md hover:bg-gray-400 transition">ยกเลิก</button>
+                        </div>
+                    </div>
+                `;
+                
+                document.body.appendChild(confirmationDiv);
+
+                const confirmBtn = document.getElementById('confirmMasterResetBtn');
+                const cancelBtn = document.getElementById('cancelMasterResetBtn');
+                const passwordInput = document.getElementById('masterResetPasswordInput');
+                passwordInput.focus();
+
+                const removeConfirmation = () => {
+                    confirmationDiv.remove();
+                };
+
+                confirmBtn.addEventListener('click', async () => {
+                    if (passwordInput.value === '3215') {
+                        try {
+                            const globalStateDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'countdownData', 'globalState');
+                            await setDoc(globalStateDocRef, {}); // This clears lockedIds and completedIds
+                            showNotification('สำเร็จ', 'ระบบได้รีเซ็ตสถานะทั้งหมดเรียบร้อยแล้ว');
+                        } catch (err) {
+                            console.error("Error performing master reset:", err);
+                            showNotification('ข้อผิดพลาด', 'ไม่สามารถรีเซ็ตระบบได้');
+                        } finally {
+                            removeConfirmation();
+                        }
+                    } else {
+                        passwordInput.classList.add('input-error');
+                        passwordInput.value = '';
+                        passwordInput.placeholder = 'รหัสผ่านไม่ถูกต้อง!';
+                        setTimeout(() => {
+                            passwordInput.classList.remove('input-error');
+                            passwordInput.placeholder = '';
+                        }, 2000);
+                    }
+                });
+
+                cancelBtn.addEventListener('click', removeConfirmation);
+            });
+        }
 
         downloadExcelBtn.addEventListener('click', () => {
             let combinedHistory = [];
@@ -1160,5 +1214,3 @@
     </script>
 </body>
 </html>
-
-
