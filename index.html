@@ -253,6 +253,9 @@
                 <video id="ocr-video" autoplay playsinline class="w-full h-auto"></video>
                 <div id="ocr-scan-box"></div>
             </div>
+            <div class="mb-2">
+                <select id="cameraSelectList" class="w-full p-2 border border-gray-300 rounded-md hidden bg-white"></select>
+            </div>
             <div id="ocr-status" class="text-gray-700 h-8 flex items-center justify-center w-full mb-2">
                  <p>กำลังเตรียมกล้อง...</p>
             </div>
@@ -340,6 +343,7 @@
         const ocrCaptureBtn = document.getElementById('ocrCaptureBtn');
         const closeOcrScannerBtn = document.getElementById('closeOcrScannerBtn');
         const ocrStatusEl = document.getElementById('ocr-status');
+        const cameraSelectList = document.getElementById('cameraSelectList');
         let tesseractWorker = null;
         let isOcrCameraReady = false;
         
@@ -1060,27 +1064,59 @@
             console.log("Tesseract worker initialized.");
         }
 
-        async function startOcrCamera() {
-            ocrStatusEl.textContent = 'กำลังเปิดกล้อง...';
-            let stream;
+        async function populateCameraList() {
             try {
                 const devices = await navigator.mediaDevices.enumerateDevices();
                 const videoDevices = devices.filter(device => device.kind === 'videoinput');
-                // Attempt to find the ultra-wide camera, common on iOS devices.
-                let selectedDevice = videoDevices.find(device => device.label.toLowerCase().includes('ultra wide'));
-                const constraints = { video: {} };
-                if (selectedDevice) {
-                    console.log('Found ultra wide camera:', selectedDevice.label);
-                    constraints.video.deviceId = { exact: selectedDevice.deviceId };
+                
+                cameraSelectList.innerHTML = '';
+                
+                if (videoDevices.length > 1) {
+                    videoDevices.forEach(device => {
+                        const option = document.createElement('option');
+                        option.value = device.deviceId;
+                        option.text = device.label || `Camera ${cameraSelectList.length + 1}`;
+                        cameraSelectList.appendChild(option);
+                    });
+                    cameraSelectList.classList.remove('hidden');
                 } else {
-                    console.log('Ultra wide camera not found, defaulting to environment facingMode.');
-                    constraints.video.facingMode = 'environment';
+                    cameraSelectList.classList.add('hidden');
                 }
+            } catch (err) {
+                console.error("Error populating camera list:", err);
+                cameraSelectList.classList.add('hidden');
+            }
+        }
+
+        async function startOcrCamera(deviceId = null) {
+            ocrStatusEl.textContent = 'กำลังเปิดกล้อง...';
+            stopOcrCamera(); 
+
+            let stream;
+            const constraints = { video: {} };
+
+            try {
+                if (deviceId) {
+                    constraints.video.deviceId = { exact: deviceId };
+                } else {
+                    const devices = await navigator.mediaDevices.enumerateDevices();
+                    const videoDevices = devices.filter(device => device.kind === 'videoinput');
+                    let selectedDevice = videoDevices.find(device => device.label.toLowerCase().includes('ultra wide'));
+                    
+                    if (selectedDevice) {
+                        console.log('Found ultra wide camera:', selectedDevice.label);
+                        constraints.video.deviceId = { exact: selectedDevice.deviceId };
+                    } else {
+                        console.log('Ultra wide camera not found, defaulting to environment facingMode.');
+                        constraints.video.facingMode = 'environment';
+                    }
+                }
+                
                 stream = await navigator.mediaDevices.getUserMedia(constraints);
+
             } catch (err) {
                  console.warn("Could not get preferred camera, falling back.", err);
                  try {
-                     // Fallback specifically to the rear camera if the initial attempt fails.
                      stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
                  } catch (fallbackErr) {
                      console.error("Error accessing any camera: ", fallbackErr);
@@ -1088,13 +1124,21 @@
                      return;
                  }
             }
+
             if (stream) {
                 ocrVideo.srcObject = stream;
-                ocrVideo.addEventListener('canplay', () => {
+                ocrVideo.addEventListener('canplay', async () => {
                     isOcrCameraReady = true;
                     ocrCaptureBtn.disabled = false;
                     ocrStatusEl.textContent = 'ระบบพร้อมแล้ว';
-                });
+                    
+                    await populateCameraList();
+                    const currentDeviceId = stream.getVideoTracks()[0].getSettings().deviceId;
+                    if (currentDeviceId) {
+                       cameraSelectList.value = currentDeviceId;
+                    }
+
+                }, { once: true });
             }
         }
 
@@ -1402,12 +1446,21 @@
             ocrScannerModal.classList.remove('hidden');
             ocrCaptureBtn.disabled = true;
             isOcrCameraReady = false;
-            startOcrCamera();
+            cameraSelectList.classList.add('hidden');
+            startOcrCamera(); 
         });
 
         closeOcrScannerBtn.addEventListener('click', () => {
             stopOcrCamera();
             ocrScannerModal.classList.add('hidden');
+            cameraSelectList.classList.add('hidden');
+        });
+
+        cameraSelectList.addEventListener('change', (event) => {
+            const selectedDeviceId = event.target.value;
+            if (selectedDeviceId) {
+                startOcrCamera(selectedDeviceId);
+            }
         });
 
         ocrCaptureBtn.addEventListener('click', async () => {
@@ -1474,3 +1527,4 @@
     </script>
 </body>
 </html>
+
