@@ -1097,17 +1097,20 @@
 
             try {
                 if (deviceId) {
+                    // If a specific camera is chosen from the dropdown, use it.
                     constraints.video.deviceId = { exact: deviceId };
                 } else {
+                    // Default camera selection logic: prioritize ultra-wide.
                     const devices = await navigator.mediaDevices.enumerateDevices();
                     const videoDevices = devices.filter(device => device.kind === 'videoinput');
-                    let selectedDevice = videoDevices.find(device => device.label.toLowerCase().includes('ultra wide'));
                     
-                    if (selectedDevice) {
-                        console.log('Found ultra wide camera:', selectedDevice.label);
-                        constraints.video.deviceId = { exact: selectedDevice.deviceId };
+                    let ultraWideCamera = videoDevices.find(device => device.label.toLowerCase().includes('ultra wide'));
+                    
+                    if (ultraWideCamera) {
+                        console.log('Defaulting to Ultra Wide camera:', ultraWideCamera.label);
+                        constraints.video.deviceId = { exact: ultraWideCamera.deviceId };
                     } else {
-                        console.log('Ultra wide camera not found, defaulting to environment facingMode.');
+                        console.log('Ultra Wide camera not found. Defaulting to environment facingMode.');
                         constraints.video.facingMode = 'environment';
                     }
                 }
@@ -1117,6 +1120,7 @@
             } catch (err) {
                  console.warn("Could not get preferred camera, falling back.", err);
                  try {
+                     // Generic fallback if all else fails
                      stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
                  } catch (fallbackErr) {
                      console.error("Error accessing any camera: ", fallbackErr);
