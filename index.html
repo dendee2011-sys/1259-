@@ -260,7 +260,7 @@
                  <p>กำลังเตรียมกล้อง...</p>
             </div>
             <div class="flex gap-4">
-                 <button id="ocrCaptureBtn" class="w-full bg-blue-600 text-white font-bold py-2 px-4 rounded-md hover:bg-blue-700 disabled:bg-gray-400">
+                 <button id="ocrCaptureBtn" class="w-full bg-blue-600 text-white font-bold py-2 px-4 rounded-md hover:bg-blue-700 hidden">
                      สแกน
                  </button>
                  <button id="closeOcrScannerBtn" class="w-full bg-red-600 text-white font-bold py-2 px-4 rounded-md hover:bg-red-700">
@@ -364,6 +364,9 @@
         const cameraSelectList = document.getElementById('cameraSelectList');
         let tesseractWorker = null;
         let isOcrCameraReady = false;
+        let ocrIntervalId = null;
+        let isOcrProcessing = false;
+
         
         // Admin Elements
         const masterResetBtn = document.getElementById('masterResetBtn');
@@ -1185,14 +1188,14 @@
                 ocrVideo.srcObject = stream;
                 ocrVideo.addEventListener('canplay', async () => {
                     isOcrCameraReady = true;
-                    ocrCaptureBtn.disabled = false;
                     ocrStatusEl.textContent = 'ระบบพร้อมแล้ว';
-                    
                     await populateCameraList();
                     const currentDeviceId = stream.getVideoTracks()[0].getSettings().deviceId;
                     if (currentDeviceId) {
                        cameraSelectList.value = currentDeviceId;
                     }
+                    // Start auto-scanning once camera is ready
+                    ocrIntervalId = setInterval(processOcrFrame, 1500); 
 
                 }, { once: true });
             }
@@ -1203,7 +1206,65 @@
                 ocrVideo.srcObject.getTracks().forEach(track => track.stop());
                 ocrVideo.srcObject = null;
                 isOcrCameraReady = false;
-                ocrCaptureBtn.disabled = true;
+            }
+             if (ocrIntervalId) {
+                clearInterval(ocrIntervalId);
+                ocrIntervalId = null;
+            }
+            isOcrProcessing = false;
+        }
+
+        async function processOcrFrame() {
+            if (!isOcrCameraReady || !tesseractWorker || isOcrProcessing) return;
+
+            isOcrProcessing = true;
+            ocrStatusEl.innerHTML = `<div class="ocr-loader w-5 h-5 border-2 border-gray-200 border-t-blue-500 rounded-full animate-spin"></div><p class="ml-2 text-sm">กำลังสแกน...</p>`;
+            
+            const canvas = document.createElement('canvas');
+            const scanBox = document.getElementById('ocr-scan-box');
+            const context = canvas.getContext('2d');
+            const videoRect = ocrVideo.getBoundingClientRect();
+            const scanBoxRect = scanBox.getBoundingClientRect();
+
+            const scaleX = ocrVideo.videoWidth / videoRect.width;
+            const scaleY = ocrVideo.videoHeight / videoRect.height;
+
+            const cropX = (scanBoxRect.left - videoRect.left) * scaleX;
+            const cropY = (scanBoxRect.top - videoRect.top) * scaleY;
+            const cropWidth = scanBoxRect.width * scaleX;
+            const cropHeight = scanBoxRect.height * scaleY;
+
+            canvas.width = cropWidth;
+            canvas.height = cropHeight;
+            context.drawImage(ocrVideo, cropX, cropY, cropWidth, cropHeight, 0, 0, cropWidth, cropHeight);
+            
+            try {
+                const { data: { text } } = await tesseractWorker.recognize(canvas);
+                const numberSequences = text.match(/\d+/g) || [];
+                if (numberSequences.length > 0) {
+                    const longestNumber = numberSequences.reduce((a, b) => a.length > b.length ? a : b);
+                    if (longestNumber.length === 13 || longestNumber.length === 7) {
+                        const record = allUsers.find(user => user.id === longestNumber || (user.hn && user.hn === longestNumber));
+
+                        if (record) {
+                            closeOcrScannerBtn.click();
+                            startProcess(record.id); 
+                        } else {
+                            ocrStatusEl.innerHTML = `<p class="text-yellow-600">พบเลข: ${longestNumber} (ไม่มีในระบบ)</p>`;
+                        }
+                    } else {
+                        ocrStatusEl.innerHTML = `<p>กำลังค้นหาเลข 7 หรือ 13 หลัก...</p>`;
+                    }
+                }
+            } catch (error) {
+                console.error('OCR Error:', error);
+                ocrStatusEl.textContent = 'เกิดข้อผิดพลาด';
+            } finally {
+                if (!ocrScannerModal.classList.contains('hidden')) { // Only reset if modal is still open
+                    setTimeout(() => {
+                        isOcrProcessing = false;
+                    }, 500); // Add a small delay before allowing another scan
+                }
             }
         }
 
@@ -1500,7 +1561,6 @@
         // --- OCR Event Listeners ---
         ocrScanBtn.addEventListener('click', () => {
             ocrScannerModal.classList.remove('hidden');
-            ocrCaptureBtn.disabled = true;
             isOcrCameraReady = false;
             cameraSelectList.classList.add('hidden');
             startOcrCamera(); 
@@ -1519,67 +1579,6 @@
             }
         });
 
-        ocrCaptureBtn.addEventListener('click', async () => {
-            if (!isOcrCameraReady || !tesseractWorker) return;
-
-            ocrCaptureBtn.disabled = true;
-            
-            const canvas = document.createElement('canvas');
-            const scanBox = document.getElementById('ocr-scan-box');
-            const context = canvas.getContext('2d');
-            const videoRect = ocrVideo.getBoundingClientRect();
-            const scanBoxRect = scanBox.getBoundingClientRect();
-
-            const scaleX = ocrVideo.videoWidth / videoRect.width;
-            const scaleY = ocrVideo.videoHeight / videoRect.height;
-
-            const cropX = (scanBoxRect.left - videoRect.left) * scaleX;
-            const cropY = (scanBoxRect.top - videoRect.top) * scaleY;
-            const cropWidth = scanBoxRect.width * scaleX;
-            const cropHeight = scanBoxRect.height * scaleY;
-
-            canvas.width = cropWidth;
-            canvas.height = cropHeight;
-            context.drawImage(ocrVideo, cropX, cropY, cropWidth, cropHeight, 0, 0, cropWidth, cropHeight);
-            
-            try {
-                const { data: { text } } = await tesseractWorker.recognize(canvas);
-                const numberSequences = text.match(/\d+/g) || [];
-                if (numberSequences.length > 0) {
-                    const longestNumber = numberSequences.reduce((a, b) => a.length > b.length ? a : b);
-                    if (longestNumber.length === 13 || longestNumber.length === 7) {
-                        // Check if the user exists in our data
-                        const record = allUsers.find(user => user.id === longestNumber || (user.hn && user.hn === longestNumber));
-
-                        if (record) {
-                            // User found: close scanner and start the timer process
-                            closeOcrScannerBtn.click();
-                            startProcess(record.id); // Always start process with the primary ID
-                        } else {
-                            // User not found: show error message within the OCR modal
-                            if(errorSynth) errorSynth.triggerAttackRelease("C3", "8n");
-                            ocrStatusEl.innerHTML = `<p class="text-red-500 font-bold">ไม่พบข้อมูลสำหรับเลข: ${longestNumber}</p>`;
-                            // Reset status message after a delay
-                            setTimeout(() => {
-                                if (ocrStatusEl.innerHTML.includes(longestNumber)) {
-                                    ocrStatusEl.innerHTML = '<p>ระบบพร้อมแล้ว</p>';
-                                }
-                            }, 3000);
-                        }
-                    } else {
-                       ocrStatusEl.textContent = 'ไม่พบตัวเลขที่ชัดเจน';
-                    }
-                } else {
-                     ocrStatusEl.textContent = 'ไม่พบตัวเลข';
-                }
-            } catch (error) {
-                console.error('OCR Error:', error);
-                ocrStatusEl.textContent = 'เกิดข้อผิดพลาด';
-            } finally {
-                ocrCaptureBtn.disabled = false; // Re-enable button for another try
-            }
-        });
-
         // Confirmation Modal Listeners
         confirmationConfirmBtn.addEventListener('click', confirmAndStartTimer);
         confirmationCancelBtn.addEventListener('click', () => {
@@ -1590,4 +1589,5 @@
     </script>
 </body>
 </html>
+" selected.
 
