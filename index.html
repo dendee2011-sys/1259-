@@ -282,6 +282,24 @@
         </div>
     </div>
 
+    <!-- Confirmation Modal -->
+    <div id="confirmationModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white p-6 rounded-lg shadow-xl w-full max-w-md text-center">
+            <h3 id="confirmationTitle" class="text-xl font-bold text-gray-800 mb-4">ยืนยันการเริ่มนับเวลา</h3>
+            <div id="confirmationUserDetails" class="text-left bg-gray-50 p-4 rounded-lg mb-6 space-y-1">
+                <!-- User details will be injected here -->
+            </div>
+            <div class="flex gap-4">
+                <button id="confirmationCancelBtn" class="w-full bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded-md hover:bg-gray-400 transition">
+                    ยกเลิก
+                </button>
+                <button id="confirmationConfirmBtn" class="w-full bg-indigo-600 text-white font-bold py-2 px-4 rounded-md hover:bg-indigo-700 transition">
+                    เริ่มนับเวลา
+                </button>
+            </div>
+        </div>
+    </div>
+
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
@@ -356,6 +374,12 @@
         const notificationMessage = document.getElementById('notificationMessage');
         const notificationCloseBtn = document.getElementById('notificationCloseBtn');
 
+        // Confirmation Modal Elements
+        const confirmationModal = document.getElementById('confirmationModal');
+        const confirmationUserDetails = document.getElementById('confirmationUserDetails');
+        const confirmationCancelBtn = document.getElementById('confirmationCancelBtn');
+        const confirmationConfirmBtn = document.getElementById('confirmationConfirmBtn');
+
 
         // App State
         let globalAnimationFrameId = null;
@@ -366,6 +390,7 @@
         let userSnapshots = {};
         let globalState = {}; // Contains lockedIds and completedIds
         let isInitialLoadComplete = false; // Flag to prevent premature state saving
+        let pendingUserRecord = null; // Holds user data before confirmation
 
         // Sound Synthesizers
         let successSynth, errorSynth;
@@ -768,6 +793,32 @@
                 return;
             }
 
+            pendingUserRecord = record;
+            
+            const durationInSeconds = sessionDefaultTimeInSeconds !== null ? sessionDefaultTimeInSeconds : parseInt(record.timeInSeconds, 10);
+            const timeFormatted = new Date(durationInSeconds * 1000).toISOString().substr(11, 8);
+
+            confirmationUserDetails.innerHTML = `
+                <p><span class="font-bold text-gray-600">ชื่อ-สกุล:</span> ${record.fullName}</p>
+                <p><span class="font-bold text-gray-600">ID:</span> ${record.id}</p>
+                <p><span class="font-bold text-gray-600">HN:</span> ${record.hn || '-'}</p>
+                <p class="mt-2 pt-2 border-t"><span class="font-bold text-gray-600">เวลาที่จะตั้ง:</span> ${timeFormatted}</p>
+            `;
+            
+            confirmationModal.classList.remove('hidden');
+
+            idInput.value = '';
+            userListContainer.classList.add('hidden');
+            renderUserList('');
+        }
+
+        async function confirmAndStartTimer() {
+            if (!pendingUserRecord) return;
+
+            const record = pendingUserRecord;
+            const primaryId = record.id;
+            const loggedInUser = sessionStorage.getItem('loggedInUser');
+
             if(successSynth) successSynth.triggerAttackRelease("C5", "8n");
             
             const globalStateDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'countdownData', 'globalState');
@@ -775,6 +826,7 @@
 
             const timerPlaceholderEl = document.getElementById('timerPlaceholder');
             if (timerPlaceholderEl) timerPlaceholderEl.remove();
+            
             const durationInSeconds = sessionDefaultTimeInSeconds !== null ? sessionDefaultTimeInSeconds : parseInt(record.timeInSeconds, 10);
             
             const completionTime = new Date().toISOString();
@@ -782,14 +834,14 @@
             
             activeTimers.push(timerData);
             createTimerCard(record, null, completionTime);
-            renderUserList(idInput.value.trim());
+            renderUserList(idInput.value.trim()); // Re-render list to update styles
             startGlobalAnimationLoop();
             updateStatusMessage(`เริ่มนับเวลาสำหรับ: ${record.fullName}`, 'success');
             saveState();
-            
-            idInput.value = '';
-            userListContainer.classList.add('hidden');
-            renderUserList('');
+
+            // Cleanup
+            pendingUserRecord = null;
+            confirmationModal.classList.add('hidden');
         }
         
         function createTimerCard(user, owner, completionTime) {
@@ -1526,6 +1578,13 @@
             } finally {
                 ocrCaptureBtn.disabled = false; // Re-enable button for another try
             }
+        });
+
+        // Confirmation Modal Listeners
+        confirmationConfirmBtn.addEventListener('click', confirmAndStartTimer);
+        confirmationCancelBtn.addEventListener('click', () => {
+            pendingUserRecord = null;
+            confirmationModal.classList.add('hidden');
         });
 
     </script>
