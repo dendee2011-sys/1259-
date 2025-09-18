@@ -130,7 +130,7 @@
                  <p class="text-indigo-600 font-bold" id="loggedInUserDisplay"></p>
              </div>
             
-             <div id="userControls">
+             <div id="userControls" class="opacity-50 pointer-events-none">
                  <div class="bg-gray-100 p-2 rounded-lg mb-4">
                      <label class="block text-xs font-medium text-gray-700 mb-1">ตั้งค่าเวลาเริ่มต้น</label>
                      <div class="grid grid-cols-3 gap-1">
@@ -549,7 +549,13 @@
                 const data = docSnap.exists() ? docSnap.data() : {};
                 updateLocalState(data);
                 renderUI();
-                isInitialLoadComplete = true; 
+                if (!isInitialLoadComplete) {
+                    isInitialLoadComplete = true; 
+                    const userControls = document.getElementById('userControls');
+                    if (userControls) {
+                        userControls.classList.remove('opacity-50', 'pointer-events-none');
+                    }
+                }
             }, (error) => {
                 console.error("Firestore snapshot error:", error);
                 statusText.textContent = "การเชื่อมต่อข้อมูลขัดข้อง";
@@ -1589,5 +1595,4 @@
     </script>
 </body>
 </html>
-" selected.
 
